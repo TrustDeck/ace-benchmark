@@ -20,8 +20,6 @@ import java.net.URISyntaxException;
 import org.trustdeck.benchmark.connector.ace.HTTPException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import jakarta.ws.rs.client.Client;
-
 /**
  * Interface for pseudonymization service
  * @param <S>
@@ -40,7 +38,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws HTTPException
      * @throws JsonProcessingException
      */
-    void createDomain(S token, T domain, Client client) throws URISyntaxException,
+    void createDomain(S token, T domain) throws URISyntaxException,
                                                   HTTPException,
                                                   JsonProcessingException;
 
@@ -52,7 +50,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws URISyntaxException
      * @throws HTTPException
      */
-    void readDomain(S token, T domain, Client client) throws URISyntaxException, HTTPException;
+    void readDomain(S token, T domain) throws URISyntaxException, HTTPException;
 
     /**
      * Update domain.
@@ -63,7 +61,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws HTTPException
      * @throws JsonProcessingException
      */
-    void updateDomain(S token, T domain, Client client) throws URISyntaxException,
+    void updateDomain(S token, T domain) throws URISyntaxException,
                                                   HTTPException,
                                                   JsonProcessingException;
 
@@ -74,7 +72,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws URISyntaxException
      * @throws HTTPException
      */
-    void deleteDomain(S token, T domain, Client client) throws URISyntaxException, HTTPException;
+    void deleteDomain(S token, T domain) throws URISyntaxException, HTTPException;
 
     /**
      * Clear all tables and vacuum them.
@@ -83,7 +81,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws URISyntaxException
      * @throws HTTPException
      */
-    void clearTables(S token, Client client) throws URISyntaxException, HTTPException;
+    void clearTables(S token) throws URISyntaxException, HTTPException;
 
     /**
      * Get table storage usage.
@@ -93,7 +91,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws URISyntaxException
      * @throws HTTPException
      */
-    String getStorage(S token, String storageIdentifier, Client client) throws URISyntaxException, HTTPException;
+    String getStorage(S token, String storageIdentifier) throws URISyntaxException, HTTPException;
 
     /**
      * Create pseudonym.
@@ -105,7 +103,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws HTTPException
      * @throws JsonProcessingException
      */
-    void createPseudonym(S token, T domain, U pseudonym, Client client) throws URISyntaxException,
+    void createPseudonym(S token, T domain, U pseudonym) throws URISyntaxException,
                                                                           HTTPException,
                                                                           JsonProcessingException;
 
@@ -119,7 +117,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws HTTPException
      * @throws JsonProcessingException
      */
-    void readPseudonym(S token, T domain, U pseudonym, Client client) throws URISyntaxException,
+    void readPseudonym(S token, T domain, U pseudonym) throws URISyntaxException,
                                                                         HTTPException,
                                                                         JsonProcessingException;
 
@@ -133,7 +131,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws HTTPException
      * @throws JsonProcessingException
      */
-    void updatePseudonym(S token, T domain, U pseudonym, Client client) throws URISyntaxException,
+    void updatePseudonym(S token, T domain, U pseudonym) throws URISyntaxException,
                                                                           HTTPException,
                                                                           JsonProcessingException;
 
@@ -147,7 +145,7 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws HTTPException
      * @throws JsonProcessingException
      */
-    void deletePseudonym(S token, T domain, U pseudonym, Client client) throws URISyntaxException,
+    void deletePseudonym(S token, T domain, U pseudonym) throws URISyntaxException,
                                                                           HTTPException,
                                                                           JsonProcessingException;
 
@@ -159,6 +157,6 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
      * @throws HTTPException
      * @throws JsonProcessingException
      */
-    void ping(S token, Client client) throws URISyntaxException, HTTPException, JsonProcessingException;
+    void ping(S token) throws URISyntaxException, HTTPException, JsonProcessingException;
 
 }

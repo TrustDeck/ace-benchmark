@@ -26,12 +26,10 @@ import org.trustdeck.benchmark.connector.Connector;
 import org.trustdeck.benchmark.connector.ConnectorException;
 import org.yaml.snakeyaml.Yaml;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-
 /**
- * Connector to ACE
- * @author Fabian Prasser
+ * Connector to ACE.
+ * 
+ * @author Fabian Prasser, Armin Müller
  */
 public class ACEConnector implements Connector{
 
@@ -47,35 +45,31 @@ public class ACEConnector implements Connector{
     /** Default start time for the pseudonym's validity period. */
     private static final String DEFAULT_PSEUDONYM_VALID_FROM = "2001-01-01T18:00:00";
     
-    /** Token lifetime*/
+    /** Token lifetime. */
     private static final long DEFAULT_TOKEN_LIFETIME = 290000;
 
-    /** Service*/
+    /** ACE service. */
     private ACEService service;
     
-    /** Authentication*/
+    /** Authentication. */
     private KeycloakAuthentication authentication;
     
-    /** Token*/
+    /** Access token. */
     private ACEToken token;
     
-    /** To track token validity*/
+    /** To track token validity. */
     private long lastAuthenticated;
     
-    /** Domain to use by ACE*/
+    /** Domain to use for the benchmarking in ACE. */
     private ACEDomain domain;
     
-    /** Web client object. */
-    private Client client;
-    
     /**
-     * Create a new instance of the service
+     * Create a new instance of the connector.
+     * 
      * @throws URISyntaxException
      */
     @SuppressWarnings("unchecked")
     public ACEConnector() throws URISyntaxException {
-    	// Create new client object
-    	this.client = ClientBuilder.newClient();
         
         // Extract the tool configuration from the loaded configuration file
         Yaml yaml = new Yaml();
@@ -101,7 +95,7 @@ public class ACEConnector implements Connector{
     }
     
     /**
-     * Authentication mechanism
+     * Authentication mechanism. Retrieves a new token or refreshes an existing one. 
      */
     private void authenticate() {
 
@@ -118,7 +112,8 @@ public class ACEConnector implements Connector{
     }
     
     /**
-     * Prepare for benchmark
+     * Prepare for benchmark.
+     * Authenticate and remove old data.
      */
     public void prepare() throws ConnectorException {
         try {
@@ -127,14 +122,14 @@ public class ACEConnector implements Connector{
     
             // Remove old data from ACE
             try {
-                service.clearTables(this.token, this.client);
+                service.clearTables(this.token);
             } catch (HTTPException e) {
                 // Ignore
             }
     
             // Refresh access token (since the old-data-removal can take a while) and create the domain
             authenticate();
-            service.createDomain(this.token, this.domain, this.client);
+            service.createDomain(this.token, this.domain);
             
         // Catch and forward errors
         } catch (Exception e) {
@@ -143,12 +138,14 @@ public class ACEConnector implements Connector{
     }
     
     /**
-     * Create pseudonym
+     * Create pseudonym.
+     * 
+     * @param id the identifier used for creating the pseudonym.
      */
     public void createPseudonym(String id) throws ConnectorException {
         try {
             authenticate();
-            service.createPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE), this.client);
+            service.createPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE));
             
         // Catch and forward errors
         } catch (Exception e) {
@@ -157,7 +154,10 @@ public class ACEConnector implements Connector{
     }
     
     /**
-     * Return storage metrics
+     * Retrieve storage metrics.
+     * 
+     * @param storageIdentifier the name of the database that should be queried.
+     * @return the raw http response containing the storage metrics
      */
     public String getStorageConsumption(String storageIdentifier) throws ConnectorException {
         try {
@@ -167,7 +167,7 @@ public class ACEConnector implements Connector{
             // Gather storage information
             String response = "";
             try {
-                response = service.getStorage(token, storageIdentifier, this.client);
+                response = service.getStorage(token, storageIdentifier);
             } catch (HTTPException e) {
                 // Ignore
             }
@@ -181,13 +181,16 @@ public class ACEConnector implements Connector{
     }
 
     /**
-     * Read pseudonym
+     * Read pseudonym.
+     * 
+     * @param id the identifier used for reading the pseudonym.
      */
+    @Override
     public void readPseudonym(String id) throws ConnectorException {
 		try {
 			// Authenticate
 		    authenticate();
-		    service.readPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE), this.client);
+		    service.readPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE));
 		    
 		// Catch and forward errors
 		} catch (Exception e) {
@@ -198,12 +201,17 @@ public class ACEConnector implements Connector{
 		}
     }
 
+    /**
+     * Update pseudonym.
+     * 
+     * @param id the identifier used for updating the pseudonym.
+     */
     @Override
     public void updatePseudonym(String id) throws ConnectorException {
         try {
         	// Authenticate
             authenticate();
-            service.updatePseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE).withValidFrom(DEFAULT_PSEUDONYM_VALID_FROM), this.client);
+            service.updatePseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE).withValidFrom(DEFAULT_PSEUDONYM_VALID_FROM));
             
         // Catch and forward errors
         } catch (Exception e) {
@@ -214,12 +222,17 @@ public class ACEConnector implements Connector{
         }
     }
 
+    /**
+     * Delete pseudonym.
+     * 
+     * @param id the identifier used for deleting the pseudonym.
+     */
     @Override
     public void deletePseudonym(String id) throws ConnectorException {
         try {
         	// Authenticate
             authenticate();
-            service.deletePseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE), this.client);
+            service.deletePseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE));
             
         // Catch and forward errors
         } catch (Exception e) {
@@ -230,13 +243,16 @@ public class ACEConnector implements Connector{
         }
     }
 
+    /**
+     * Ping ACE.
+     */
     @Override
     public void ping() throws ConnectorException {
         try {
         	// Authenticate
         	authenticate();
         	
-            service.ping(this.token, this.client);
+            service.ping(this.token);
         // Catch and forward errors
         } catch (Exception e) {
             // It is ok if the endpoint does not exist

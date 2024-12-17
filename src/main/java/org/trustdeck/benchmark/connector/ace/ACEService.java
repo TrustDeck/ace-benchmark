@@ -29,8 +29,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.ws.rs.client.Client;
-
 /**
  * This class implements the requests against ACE's API.
  * 
@@ -63,10 +61,9 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws JsonProcessingException
      */
     @Override
-    public void createDomain(ACEToken token, ACEDomain domain, Client client) throws URISyntaxException, HTTPException, JsonProcessingException {
+    public void createDomain(ACEToken token, ACEDomain domain) throws URISyntaxException, HTTPException, JsonProcessingException {
         // Build the request
-        HTTPRequest request = new HTTPRequest(client,
-        									  service,
+        HTTPRequest request = new HTTPRequest(service,
                                               "/domain",
                                               HTTPRequestType.POST,
                                               token.getToken(),
@@ -86,14 +83,13 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws HTTPException
      */
     @Override
-    public void readDomain(ACEToken token, ACEDomain domain, Client client) throws URISyntaxException, HTTPException {
+    public void readDomain(ACEToken token, ACEDomain domain) throws URISyntaxException, HTTPException {
         // Store query parameters
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put("name", domain.getName());
         
         // Build the request
-        HTTPRequest request = new HTTPRequest(client,
-        									  service,
+        HTTPRequest request = new HTTPRequest(service,
                                               "/domain",
                                               HTTPRequestType.GET,
                                               token.getToken(),
@@ -113,10 +109,9 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws JsonProcessingException
      */
     @Override
-    public void updateDomain(ACEToken token, ACEDomain domain, Client client) throws URISyntaxException, HTTPException, JsonProcessingException {
+    public void updateDomain(ACEToken token, ACEDomain domain) throws URISyntaxException, HTTPException, JsonProcessingException {
     	// Build the request
-        HTTPRequest request = new HTTPRequest(client,
-				  							  service,
+        HTTPRequest request = new HTTPRequest(service,
                                               "/domain",
                                               HTTPRequestType.PUT,
                                               token.getToken(),
@@ -135,14 +130,13 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
 	 * @throws HTTPException
      */
     @Override
-    public void deleteDomain(ACEToken token, ACEDomain domain, Client client) throws URISyntaxException, HTTPException {
+    public void deleteDomain(ACEToken token, ACEDomain domain) throws URISyntaxException, HTTPException {
     	// Store query parameters
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put("name", domain.getName());
         
         // Build the request
-        HTTPRequest request = new HTTPRequest(client,
-        									  service,
+        HTTPRequest request = new HTTPRequest(service,
                                               "/domain",
                                               HTTPRequestType.DELETE,
                                               token.getToken(),
@@ -160,15 +154,15 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws HTTPException
      */
     @Override
-    public void clearTables(ACEToken token, Client client) throws URISyntaxException, HTTPException {
+    public void clearTables(ACEToken token) throws URISyntaxException, HTTPException {
     	// Build the requests and execute them
-    	HTTPRequest request = new HTTPRequest(client, service, "/table/pseudonym", HTTPRequestType.DELETE, token.getToken(), null);
+    	HTTPRequest request = new HTTPRequest(service, "/table/pseudonym", HTTPRequestType.DELETE, token.getToken(), null);
         request.execute();
         
-        request = new HTTPRequest(client, service, "/table/domain", HTTPRequestType.DELETE, token.getToken(), null);
+        request = new HTTPRequest(service, "/table/domain", HTTPRequestType.DELETE, token.getToken(), null);
         request.execute();
         
-        request = new HTTPRequest(client, service, "/table/auditevent", HTTPRequestType.DELETE, token.getToken(), null);
+        request = new HTTPRequest(service, "/table/auditevent", HTTPRequestType.DELETE, token.getToken(), null);
         request.execute();
     }
     
@@ -180,9 +174,9 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws HTTPException
      */
     @Override
-    public String getStorage(ACEToken token, String tableName, Client client) throws URISyntaxException, HTTPException {
+    public String getStorage(ACEToken token, String tableName) throws URISyntaxException, HTTPException {
     	// Build the request and execute them
-    	HTTPRequest request = new HTTPRequest(client, service, "/table/"+tableName+"/storage", HTTPRequestType.GET, token.getToken(), null);
+    	HTTPRequest request = new HTTPRequest(service, "/table/"+tableName+"/storage", HTTPRequestType.GET, token.getToken(), null);
         return request.execute();
     }
 
@@ -197,10 +191,9 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws JsonProcessingException
      */
     @Override
-    public void createPseudonym(ACEToken token, ACEDomain domain, ACEPseudonym pseudonym, Client client) throws URISyntaxException, HTTPException, JsonProcessingException {
+    public void createPseudonym(ACEToken token, ACEDomain domain, ACEPseudonym pseudonym) throws URISyntaxException, HTTPException, JsonProcessingException {
     	// Build the request
-    	HTTPRequest request = new HTTPRequest(client,
-											  service, 
+    	HTTPRequest request = new HTTPRequest(service, 
 											  "/domains/" + domain.getName() + "/pseudonym", 
 											  HTTPRequestType.POST, 
 											  token.getToken(), 
@@ -222,15 +215,14 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws JsonProcessingException
      */
     @Override
-    public void readPseudonym(ACEToken token, ACEDomain domain, ACEPseudonym pseudonym, Client client) throws URISyntaxException, HTTPException, JsonProcessingException {
+    public void readPseudonym(ACEToken token, ACEDomain domain, ACEPseudonym pseudonym) throws URISyntaxException, HTTPException, JsonProcessingException {
     	// Store query parameters
     	HashMap<String, String> parameters = new HashMap<>();
         parameters.put("id", pseudonym.getId());
         parameters.put("idType", pseudonym.getIdType());
         
         // Build the request
-        HTTPRequest request = new HTTPRequest(client,
-											  service, 
+        HTTPRequest request = new HTTPRequest(service, 
 											  "/domains/" + domain.getName() + "/pseudonym", 
 											  HTTPRequestType.GET, 
 											  token.getToken(),
@@ -251,15 +243,14 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws JsonProcessingException
      */
     @Override
-    public void updatePseudonym(ACEToken token, ACEDomain domain, ACEPseudonym pseudonym, Client client) throws URISyntaxException, HTTPException, JsonProcessingException {
+    public void updatePseudonym(ACEToken token, ACEDomain domain, ACEPseudonym pseudonym) throws URISyntaxException, HTTPException, JsonProcessingException {
     	// Store query parameters
     	HashMap<String, String> parameters = new HashMap<>();
         parameters.put("id", pseudonym.getId());
         parameters.put("idType", pseudonym.getIdType());
         
         // Build the request
-        HTTPRequest request = new HTTPRequest(client,
-        									  service, 
+        HTTPRequest request = new HTTPRequest(service, 
         									  "/domains/" + domain.getName() + "/pseudonym", 
         									  HTTPRequestType.PUT, 
         									  token.getToken(), 
@@ -282,15 +273,14 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws JsonProcessingException
      */
     @Override
-    public void deletePseudonym(ACEToken token, ACEDomain domain, ACEPseudonym pseudonym, Client client) throws URISyntaxException, HTTPException, JsonProcessingException {
+    public void deletePseudonym(ACEToken token, ACEDomain domain, ACEPseudonym pseudonym) throws URISyntaxException, HTTPException, JsonProcessingException {
     	// Store query parameters
     	HashMap<String, String> parameters = new HashMap<>();
         parameters.put("id", pseudonym.getId());
         parameters.put("idType", pseudonym.getIdType());
         
         // Build the request
-        HTTPRequest request = new HTTPRequest(client,
-        									  service, 
+        HTTPRequest request = new HTTPRequest(service, 
         									  "/domains/" + domain.getName() + "/pseudonym", 
         									  HTTPRequestType.DELETE, 
         									  token.getToken(),
@@ -309,9 +299,9 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
      * @throws JsonProcessingException
      */
     @Override
-    public void ping(ACEToken token, Client client) throws URISyntaxException, HTTPException, JsonProcessingException {
+    public void ping(ACEToken token) throws URISyntaxException, HTTPException, JsonProcessingException {
     	// Build the request
-    	HTTPRequest request = new HTTPRequest(client, service, "/ping", HTTPRequestType.GET, token.getToken(), null);
+    	HTTPRequest request = new HTTPRequest(service, "/ping", HTTPRequestType.GET, token.getToken(), null);
         
         // Execute
         request.execute();

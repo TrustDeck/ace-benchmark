@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
@@ -85,13 +84,12 @@ public class HTTPRequest {
      * @param authToken
      * @param parameters
      */
-    public HTTPRequest(Client client,
-    				   URI server,
+    public HTTPRequest(URI server,
                        String path,
                        HTTPRequestType requestType,
                        String authToken,
                        Map<String, String> parameters) {
-        this(client, server, path, requestType, authToken, null, null, parameters);
+        this(server, path, requestType, authToken, null, null, parameters);
     }
 
     /**
@@ -104,16 +102,11 @@ public class HTTPRequest {
      * @param body
      * @param bodyMediaType
      */
-    public HTTPRequest(Client client, URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType) {
-        this.client = client;
-        this.server = server;
-        this.path = path;
-        this.requestType = requestType;
-        this.authToken = authToken;
-        this.body = body;
-        this.bodyMediaType = bodyMediaType != null ? bodyMediaType : 
-             (requestType == HTTPRequestType.POST || requestType == HTTPRequestType.PUT ? HTTPMediaType.APPLICATION_JSON : HTTPMediaType.TEXT_PLAIN);
-        this.parameters = null;
+    public HTTPRequest(URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType) {
+    	this(server, path, requestType, authToken, body, 
+        		bodyMediaType != null ? bodyMediaType : 
+        			(requestType == HTTPRequestType.POST || requestType == HTTPRequestType.PUT ? HTTPMediaType.APPLICATION_JSON : HTTPMediaType.TEXT_PLAIN),
+        		null);
     }
     
     /**
@@ -127,8 +120,8 @@ public class HTTPRequest {
      * @param bodyMediaType
      * @param parameters
      */
-    public HTTPRequest(Client client, URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType, Map<String, String> parameters) {
-        this.client = client;
+    public HTTPRequest(URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType, Map<String, String> parameters) {
+        this.client = ClientManager.getClient();
         this.server = server;
         this.path = path;
         this.requestType = requestType;
@@ -206,7 +199,7 @@ public class HTTPRequest {
 			// Read and return the response entity
 			return response.readEntity(String.class);
 		} finally {
-			client.close();
+			// Do nothing
 		}
     }
 }

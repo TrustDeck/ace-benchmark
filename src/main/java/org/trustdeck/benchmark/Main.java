@@ -32,6 +32,7 @@ import java.util.Map;
 import org.trustdeck.benchmark.connector.Connector;
 import org.trustdeck.benchmark.connector.ConnectorException;
 import org.trustdeck.benchmark.connector.ace.ACEConnector;
+import org.trustdeck.benchmark.connector.ace.ClientManager;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -90,7 +91,6 @@ public class Main {
                         .build());
             }
         }
-        
 
         // Create connector
         System.out.print("\r - Preparing service: creating authentication and service object");
@@ -114,31 +114,32 @@ public class Main {
      */
     private static final void execute(Connector connector,
                                       Configuration config) throws IOException, ConnectorException {
-        // Some logging
-        System.out.println("Executing configuration: " + config.getName());
-        
+               
         // Identifiers
         System.out.print("\r - Preparing benchmark: creating identifiers                      ");
         Identifiers identifiers = new Identifiers();
-        System.out.println("\r - Preparing benchmark: creating identifiers\t\t[DONE]");
+        System.out.println("\r - Preparing benchmark: creating identifiers\t\t\t\t[DONE]");
 
         // Statistics
         System.out.print("\r - Preparing benchmark: creating statistics                      ");
         Statistics statistics = new Statistics(config);
-        System.out.println("\r - Preparing benchmark: creating statistics\t\t[DONE]");
+        System.out.println("\r - Preparing benchmark: creating statistics\t\t\t\t[DONE]");
         
         // Provider
         System.out.print("\r - Preparing benchmark: creating work provider                      ");
         WorkProvider provider = new WorkProvider(config, identifiers, statistics);
-        System.out.println("\r - Preparing benchmark: creating work provider\t\t[DONE]");
+        System.out.println("\r - Preparing benchmark: creating work provider\t\t\t\t[DONE]");
         
         // Prepare
         System.out.print("\r - Preparing benchmark: purge database and re-initialize            ");
         provider.prepare(connector);
-        System.out.println("\r - Preparing benchmark: purge database and re-initialize\t[DONE]");
+        System.out.println("\r - Preparing benchmark: purge database and re-initialize\t\t[DONE]");
         
         // Some logging
-        System.out.println("\r - Preparing benchmark: Done                                              ");
+        System.out.println("\r - Preparing benchmark: Done");
+        
+        // Some logging
+        System.out.println(" - Executing configuration: " + config.getName());
         
         // Start workers
         statistics.start();
@@ -147,7 +148,7 @@ public class Main {
         }
         
         // Some logging
-        System.out.println(" - Number of workers launched: " + config.getNumThreads());
+        System.out.println("   - Number of workers launched: " + config.getNumThreads());
         
         // Files to write to
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(config.getName() + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv")));
@@ -162,7 +163,7 @@ public class Main {
                 writer.flush();
                 
                 // Print progress
-                System.out.print("\r - Progress: " + (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d + " %");
+                System.out.print("\r   - Progress: " + (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d + " %");
             }
             
             // Reporting DB storage size
@@ -173,7 +174,7 @@ public class Main {
             
             // End of experiment
             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
-            	System.out.println("\r - Progress: 100 % ");
+            	System.out.println("\r   - Progress: 100 % ");
                 break;
             }
             
@@ -195,6 +196,9 @@ public class Main {
         if (config.isReportDBSpace()) {
         	dbWriter.close();
         }
+        
+        // Close client
+        ClientManager.shutdown();
         
         // Some logging
         System.out.println(" - Done");
