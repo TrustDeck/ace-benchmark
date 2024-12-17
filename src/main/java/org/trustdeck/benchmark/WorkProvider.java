@@ -50,7 +50,7 @@ public class WorkProvider {
      * @param statistics
      */
     public WorkProvider(Configuration config, Identifiers identifiers, Statistics statistics) {
-        
+    	
         // Store config
         this.config = config;
         this.identifiers = identifiers;

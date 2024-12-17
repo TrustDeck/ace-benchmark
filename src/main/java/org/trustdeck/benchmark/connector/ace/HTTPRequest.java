@@ -53,6 +53,9 @@ public class HTTPRequest {
         APPLICATION_JSON
     };
     
+    /** The web client object needed to generate and send requests. */
+    private final Client client;
+    
     /** The server to where the request should go to. */
     private final URI server;
     
@@ -82,12 +85,13 @@ public class HTTPRequest {
      * @param authToken
      * @param parameters
      */
-    public HTTPRequest(URI server,
+    public HTTPRequest(Client client,
+    				   URI server,
                        String path,
                        HTTPRequestType requestType,
                        String authToken,
                        Map<String, String> parameters) {
-        this(server, path, requestType, authToken, null, null, parameters);
+        this(client, server, path, requestType, authToken, null, null, parameters);
     }
 
     /**
@@ -100,8 +104,8 @@ public class HTTPRequest {
      * @param body
      * @param bodyMediaType
      */
-    public HTTPRequest(URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType) {
-        
+    public HTTPRequest(Client client, URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType) {
+        this.client = client;
         this.server = server;
         this.path = path;
         this.requestType = requestType;
@@ -123,8 +127,8 @@ public class HTTPRequest {
      * @param bodyMediaType
      * @param parameters
      */
-    public HTTPRequest(URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType, Map<String, String> parameters) {
-        
+    public HTTPRequest(Client client, URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType, Map<String, String> parameters) {
+        this.client = client;
         this.server = server;
         this.path = path;
         this.requestType = requestType;
@@ -145,9 +149,9 @@ public class HTTPRequest {
         
         // Create target
         // newClient might be expensive? Use one client?
-    	Client client = ClientBuilder.newClient();
+    	//Client client = ClientBuilder.newClient();
 		try {
-			WebTarget target = client.target(server).path(path);
+			WebTarget target = this.client.target(server).path(path);
 			
 			if (parameters != null && !parameters.isEmpty()) {
 				for (Entry<String, String> parameter : parameters.entrySet()) {

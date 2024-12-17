@@ -26,6 +26,9 @@ import org.trustdeck.benchmark.connector.Connector;
 import org.trustdeck.benchmark.connector.ConnectorException;
 import org.yaml.snakeyaml.Yaml;
 
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+
 /**
  * Connector to ACE
  * @author Fabian Prasser
@@ -62,12 +65,17 @@ public class ACEConnector implements Connector{
     /** Domain to use by ACE*/
     private ACEDomain domain;
     
+    /** Web client object. */
+    private Client client;
+    
     /**
      * Create a new instance of the service
      * @throws URISyntaxException
      */
     @SuppressWarnings("unchecked")
     public ACEConnector() throws URISyntaxException {
+    	// Create new client object
+    	this.client = ClientBuilder.newClient();
         
         // Extract the tool configuration from the loaded configuration file
         Yaml yaml = new Yaml();
@@ -113,24 +121,22 @@ public class ACEConnector implements Connector{
      * Prepare for benchmark
      */
     public void prepare() throws ConnectorException {
-        
         try {
-            
             // Authenticate
             authenticate();
     
             // Remove old data from ACE
             try {
-                service.clearTables(this.token);
-            } catch(HTTPException e) {
+                service.clearTables(this.token, this.client);
+            } catch (HTTPException e) {
                 // Ignore
             }
     
             // Refresh access token (since the old-data-removal can take a while) and create the domain
             authenticate();
-            service.createDomain(this.token, this.domain);
+            service.createDomain(this.token, this.domain, this.client);
             
-        // Catch errors
+        // Catch and forward errors
         } catch (Exception e) {
             throw new ConnectorException(e);
         }
@@ -140,12 +146,11 @@ public class ACEConnector implements Connector{
      * Create pseudonym
      */
     public void createPseudonym(String id) throws ConnectorException {
-        
         try {
             authenticate();
-            service.createPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE));
+            service.createPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE), this.client);
             
-        // Catch errors
+        // Catch and forward errors
         } catch (Exception e) {
             throw new ConnectorException(e);
         }
@@ -155,23 +160,21 @@ public class ACEConnector implements Connector{
      * Return storage metrics
      */
     public String getStorageConsumption(String storageIdentifier) throws ConnectorException {
-        
         try {
-            
             // Authenticate
             authenticate();
 
             // Gather storage information
             String response = "";
             try {
-                response = service.getStorage(token, storageIdentifier);
-            } catch(HTTPException e) {
+                response = service.getStorage(token, storageIdentifier, this.client);
+            } catch (HTTPException e) {
                 // Ignore
             }
             
             return response;
             
-        // Catch errors
+        // Catch and forward errors
         } catch (Exception e) {
             throw new ConnectorException(e);
         }
@@ -181,29 +184,29 @@ public class ACEConnector implements Connector{
      * Read pseudonym
      */
     public void readPseudonym(String id) throws ConnectorException {
-        
-        try {
-            authenticate();
-            service.readPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE));
-            
-        // Catch errors
-         } catch (Exception e) {
-            // It is ok if the pseudonym does not exist
-            if (!(e instanceof HTTPException && ((HTTPException) e).getStatusCode() == 404)) {
-                throw new ConnectorException(e);
-            } 
-        }
+		try {
+			// Authenticate
+		    authenticate();
+		    service.readPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE), this.client);
+		    
+		// Catch and forward errors
+		} catch (Exception e) {
+		    // It is ok if the pseudonym does not exist
+		    if (!(e instanceof HTTPException && ((HTTPException) e).getStatusCode() == 404)) {
+		        throw new ConnectorException(e);
+		    } 
+		}
     }
 
     @Override
     public void updatePseudonym(String id) throws ConnectorException {
-        
         try {
+        	// Authenticate
             authenticate();
-            service.updatePseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE).withValidFrom(DEFAULT_PSEUDONYM_VALID_FROM));
+            service.updatePseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE).withValidFrom(DEFAULT_PSEUDONYM_VALID_FROM), this.client);
             
-        // Catch errors
-         } catch (Exception e) {
+        // Catch and forward errors
+        } catch (Exception e) {
             // It is ok if the pseudonym does not exist
             if (!(e instanceof HTTPException && ((HTTPException) e).getStatusCode() == 404)) {
                 throw new ConnectorException(e);
@@ -213,14 +216,13 @@ public class ACEConnector implements Connector{
 
     @Override
     public void deletePseudonym(String id) throws ConnectorException {
-        
-
         try {
+        	// Authenticate
             authenticate();
-            service.deletePseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE));
+            service.deletePseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE), this.client);
             
-        // Catch errors
-         } catch (Exception e) {
+        // Catch and forward errors
+        } catch (Exception e) {
             // It is ok if the pseudonym does not exist
             if (!(e instanceof HTTPException && ((HTTPException) e).getStatusCode() == 404)) {
                 throw new ConnectorException(e);
@@ -231,7 +233,11 @@ public class ACEConnector implements Connector{
     @Override
     public void ping() throws ConnectorException {
         try {
-            service.ping(token);
+        	// Authenticate
+        	authenticate();
+        	
+            service.ping(this.token, this.client);
+        // Catch and forward errors
         } catch (Exception e) {
             // It is ok if the endpoint does not exist
             if (!(e instanceof HTTPException && ((HTTPException) e).getStatusCode() == 404)) {
