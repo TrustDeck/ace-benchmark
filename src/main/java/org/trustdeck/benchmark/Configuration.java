@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import lombok.Getter;
 /**
  * This class represents the configuration object for a benchmarking run.
  * 
- * @author Felix Wirth and Armin Müller
+ * @author Felix Wirth and Armin MÃ¼ller
  */
 @Getter
 public class Configuration {

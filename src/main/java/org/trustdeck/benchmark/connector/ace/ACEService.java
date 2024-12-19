@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * This class implements the requests against ACE's API.
  * 
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin MÃ¼ller, Felix N. Wirth, and Fabian Prasser
  */
 public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, ACEPseudonym> {
     

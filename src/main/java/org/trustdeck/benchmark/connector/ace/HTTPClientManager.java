@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import jakarta.ws.rs.client.ClientBuilder;
 /**
  * Singleton class for managing the client object needed for generating requests.
  * 
- * @author Armin Müller
+ * @author Armin MÃ¼ller
  */
 public class HTTPClientManager {
     

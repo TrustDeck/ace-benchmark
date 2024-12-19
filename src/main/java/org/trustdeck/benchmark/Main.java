@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.yaml.snakeyaml.Yaml;
 /**
  * Main class of the benchmark driver.
  * 
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin MÃ¼ller, Felix N. Wirth, and Fabian Prasser
  */
 public class Main {
 
