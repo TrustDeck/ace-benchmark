@@ -17,13 +17,13 @@
 package org.trustdeck.benchmark.connector;
 
 /**
- * Generic token interface
+ * Generic token interface.
+ * 
  * @param <T>
  * @author Fabian Prasser
  */
 public interface Token<T> {
 
-    /** Token*/
+    /** Token. */
     T getToken();
-
 }

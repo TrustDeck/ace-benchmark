@@ -19,15 +19,18 @@ package org.trustdeck.benchmark.connector.ace;
 import org.trustdeck.benchmark.connector.Token;
 
 /**
- * Authentication token
+ * Authentication token.
+ * 
+ * @author Fabian Prasser
  */
 public class ACEToken implements Token<String> {
    
-    /** Authentication token*/
+    /** Authentication token. */
     private String token;
     
     /**
-     * Create a new instance
+     * Create a new instance.
+     * 
      * @param token
      */
     public ACEToken(String token) {

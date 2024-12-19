@@ -17,7 +17,8 @@
 package org.trustdeck.benchmark.connector;
 
 /**
- * Generic pseudonym
+ * Generic pseudonym interface.
+ * 
  * @author Fabian Prasser
  */
 public interface Pseudonym {

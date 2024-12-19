@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin MÃ¼ller and contributors.
+ * Copyright 2024 Armin Müller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,12 @@ import java.util.Map;
 import org.trustdeck.benchmark.connector.ConnectorException;
 import org.trustdeck.benchmark.connector.ConnectorFactory;
 import org.trustdeck.benchmark.connector.ace.ACEConnectorFactory;
-import org.trustdeck.benchmark.connector.ace.ACEConnector;
-import org.trustdeck.benchmark.connector.ace.ClientManager;
 import org.yaml.snakeyaml.Yaml;
 
 /**
  * Main class of the benchmark driver.
  * 
- * @author Armin MÃ¼ller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
  */
 public class Main {
 
@@ -52,7 +50,7 @@ public class Main {
 
         // Extract the benchmark configuration from the loaded configuration file
         @SuppressWarnings("unchecked")
-		    Map<String, Object> benchmarkConfig = (Map<String, Object>) yamlConfig.get("benchmark");
+		Map<String, Object> benchmarkConfig = (Map<String, Object>) yamlConfig.get("benchmark");
         final int INITIAL_DB_SIZE = (int) benchmarkConfig.get("initialDbSize");
         final int MAX_TIME = (int) benchmarkConfig.get("maxTime");
         final int REPORTING_INTERVAL = (int) benchmarkConfig.get("reportingInterval");

@@ -17,12 +17,15 @@
 package org.trustdeck.benchmark.connector;
 
 /**
- * Connector exception
+ * Connector exception.
+ * 
+ * @author Fabian Prasser
  */
 public class ConnectorException extends Exception {
 
     /**
-     * New instance
+     * New instance.
+     * 
      * @param e
      */
     public ConnectorException(Exception e) {

@@ -255,8 +255,8 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
         									  HTTPRequestType.PUT, 
         									  token.getToken(), 
         									  MAPPER.writer().writeValueAsString(pseudonym), 
-                HTTPMediaType.APPLICATION_JSON,
-				  parameters);
+        									  HTTPMediaType.APPLICATION_JSON,
+        									  parameters);
         
         // Execute
         request.execute();

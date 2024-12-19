@@ -17,7 +17,8 @@
 package org.trustdeck.benchmark.connector;
 
 /**
- * Generic interface
+ * Generic domain interface.
+ * 
  * @author Fabian Prasser
  */
 public interface Domain {

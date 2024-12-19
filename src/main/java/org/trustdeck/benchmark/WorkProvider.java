@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin MÃ¼ller and contributors.
+ * Copyright 2024 Armin Müller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.trustdeck.benchmark.connector.ConnectorFactory;
 /**
  * Class that provides the work for the worker threads.
  * 
- * @author Armin MÃ¼ller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
  */
 public class WorkProvider {
     
@@ -71,14 +71,12 @@ public class WorkProvider {
                     }
                 });
         
-        
         // Distribution of work
         this.distribution = new WorkDistribution(config.getCreateRate(),
                                                  config.getReadRate(),
                                                  config.getUpdateRate(),
                                                  config.getDeleteRate(),
                                                  config.getPingRate());
-        
     }
     
     /**
@@ -93,7 +91,6 @@ public class WorkProvider {
         for (int i = 0; i < config.getInitialDBSize(); i++) {
             threadLocalConnectors.get().createPseudonym(identifiers.create());
         }
-        
     }
     
     /**
@@ -104,7 +101,6 @@ public class WorkProvider {
      */
     public String getDBStorageMetrics(String storageIdentifier) throws ConnectorException {
         return threadLocalConnectors.get().getStorageConsumption(storageIdentifier);
-        
     }
     
     /**

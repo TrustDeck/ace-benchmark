@@ -17,13 +17,15 @@
 package org.trustdeck.benchmark.connector;
 
 /**
- * A factory for connector
+ * A factory for connectors.
+ * 
+ * @author Fabian Prasser
  */
 public interface ConnectorFactory {
 
-    /** Create a connector*/
+    /** Create a connector. */
     public Connector create() throws ConnectorException;
 
-    /** Shutdown the factory and all associated resources*/
+    /** Shutdown the factory and all associated resources. */
     public void shutdown();
 }

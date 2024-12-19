@@ -21,7 +21,8 @@ import org.trustdeck.benchmark.connector.ace.HTTPException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
- * Interface for pseudonymization service
+ * Interface for pseudonymization services.
+ * 
  * @param <S>
  * @param <T>
  * @param <U>

@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin M�ller and contributors.
+ * Copyright 2024 Armin Müller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,16 @@ import org.trustdeck.benchmark.connector.ConnectorFactory;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- * ACE connector factory
+ * ACE connector factory.
+ * 
+ * @author Fabian Prasser, Armin Müller
  */
 public class ACEConnectorFactory implements ConnectorFactory {
 
     /**
-     * Creates a new connector
-     * @return
-     * @throws URISyntaxException 
+     * Creates a new connector.
+     * 
+     * @return the initialized connector
      * @throws ConnectorException 
      */
     public ACEConnector create() throws ConnectorException {
@@ -59,18 +61,18 @@ public class ACEConnectorFactory implements ConnectorFactory {
         ACEConnector connector;
         try {
             connector = new ACEConnector(authClientId,
-                                                      authClientSecret,
-                                                      authKeycloakURI,
-                                                      authKeycloakRealmName,
-                                                      authUsername,
-                                                      authPassword,
-                                                      serviceURI,
-                                                      serviceDomainName);
+                                         authClientSecret,
+                                         authKeycloakURI,
+                                         authKeycloakRealmName,
+                                         authUsername,
+                                         authPassword,
+                                         serviceURI,
+                                         serviceDomainName);
         } catch (URISyntaxException e) {
             throw new ConnectorException(e);
         }
 
-        // Prepare and return
+        // Prepare for the benchmark and return the connector
         connector.prepare();
         return connector;
     }
