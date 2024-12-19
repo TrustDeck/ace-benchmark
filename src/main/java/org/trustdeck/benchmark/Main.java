@@ -160,8 +160,11 @@ public class Main {
                 statistics.report(writer);
                 writer.flush();
                 
+                // Calculate Progress
+                double progress = (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d;
+                
                 // Print progress
-                System.out.print("\r   - Progress: " + (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d + " %");
+                System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)");
             }
             
             // Reporting DB storage size
@@ -172,7 +175,7 @@ public class Main {
             
             // End of experiment
             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
-            	System.out.println("\r   - Progress: 100 % ");
+            	System.out.println("\r   - Progress: 100 %                             ");
                 break;
             }
             

@@ -79,6 +79,10 @@ public class Statistics {
     
     /** Number of combined creates, reads, updates, and deletes from last statistic-gathering */
     private int lastCRUDs = 0;
+    
+    /** Number of transactions per second in the last reporting step. */
+    @Getter
+    private int lastOverallTPS = 0;
    
     /**
      * Creates a new instance.
@@ -196,6 +200,7 @@ public class Statistics {
         this.lastDeletes = currentDeletes;
         this.lastPings = currentPings;
         this.lastCRUDs = currentCRUDs;
+        this.lastOverallTPS = (int) tpsOverall;
     }
     
     /**
