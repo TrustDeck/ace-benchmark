@@ -139,6 +139,10 @@ public class HTTPRequest {
      * @return the request's response as a string
      */
     public String execute() {
+    	// Check if client is available. If not, the experiment might already be finished
+    	if (client == null) {
+    		return "";
+    	}
 
         WebTarget target = this.client.target(server).path(path);
 

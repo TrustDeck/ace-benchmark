@@ -122,7 +122,12 @@ public class WorkProvider {
 	                    try {
                             connector.createPseudonym(identifiers.create());
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
 	                    statistics.addCreate();
 	                }
@@ -134,7 +139,12 @@ public class WorkProvider {
 	                    try {
                             connector.readPseudonym(identifiers.read());
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
 	                    statistics.addRead();
 	                }
@@ -146,7 +156,12 @@ public class WorkProvider {
 	                    try {
                             connector.updatePseudonym(identifiers.read());
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
 	                    statistics.addUpdate();
 	                }
@@ -158,7 +173,12 @@ public class WorkProvider {
 	                    try {
                             connector.deletePseudonym(identifiers.read());
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
 	                    statistics.addDelete();
 	                }
@@ -170,7 +190,12 @@ public class WorkProvider {
 	                    try {
                             connector.ping();
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
                         statistics.addPing();
 	                }
