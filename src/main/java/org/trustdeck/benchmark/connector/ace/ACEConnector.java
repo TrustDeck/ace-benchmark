@@ -16,22 +16,18 @@
  */
 package org.trustdeck.benchmark.connector.ace;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
 
-import org.trustdeck.benchmark.Main;
 import org.trustdeck.benchmark.connector.Connector;
 import org.trustdeck.benchmark.connector.ConnectorException;
-import org.yaml.snakeyaml.Yaml;
 
 /**
  * Connector to ACE.
  * 
  * @author Fabian Prasser, Armin Müller
  */
-public class ACEConnector implements Connector{
+public class ACEConnector implements Connector {
 
     /** Default domain prefix. */
     private static final String DEFAULT_DOMAIN_PREFIX = "TST";
@@ -68,32 +64,32 @@ public class ACEConnector implements Connector{
      * 
      * @throws URISyntaxException
      */
-    @SuppressWarnings("unchecked")
-    public ACEConnector() throws URISyntaxException {
+    public ACEConnector(String authClientId,
+                        String authClientSecret,
+                        String authKeycloakURI,
+                        String authKeycloakRealmName,
+                        String authUsername,
+                        String authPassword,
+                        String serviceURI,
+                        String serviceDomainName) throws URISyntaxException {
         
-        // Extract the tool configuration from the loaded configuration file
-        Yaml yaml = new Yaml();
-        InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("config.yaml");
-        Map<String, Object> yamlConfig = yaml.load(inputStream);
-        Map<String, String> toolConfig = (Map<String, String>) yamlConfig.get("ace");
- 
         // Authentication
         this.authentication = new KeycloakAuthentication()
-                .setClientId(toolConfig.get("clientId"))
-                .setClientSecret(toolConfig.get("clientSecret"))
-                .setKeycloakAuthenticationURI(toolConfig.get("keycloakAuthUri"))
-                .setKeycloakRealmName(toolConfig.get("keycloakRealmName"))
-                .setUsername(toolConfig.get("username"))
-                .setPassword(toolConfig.get("password"));
+                .setClientId(authClientId)
+                .setClientSecret(authClientSecret)
+                .setKeycloakAuthenticationURI(authKeycloakURI)
+                .setKeycloakRealmName(authKeycloakRealmName)
+                .setUsername(authUsername)
+                .setPassword(authPassword);
         
         // Instantiate service
-        this.service = new ACEService(new URI(toolConfig.get("uri")));
+        this.service = new ACEService(new URI(serviceURI));
         
         // Prepare domain
-        this.domain = new ACEDomain((String) toolConfig.get("domainName"), DEFAULT_DOMAIN_PREFIX);
+        this.domain = new ACEDomain(serviceDomainName, DEFAULT_DOMAIN_PREFIX);
         this.domain.setValidFrom(DEFAULT_DOMAIN_VALID_FROM);
     }
-    
+
     /**
      * Authentication mechanism. Retrieves a new token or refreshes an existing one. 
      */
