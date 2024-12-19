@@ -91,6 +91,9 @@ public class Main {
             }
         }
 
+        // Some logging
+        System.out.println("\n++++++++++++++++++++++++++++ ACE Benchmark ++++++++++++++++++++++++++++\n");
+        
         // Execute
         ConnectorFactory factory = new ACEConnectorFactory();
         for (Configuration config : configs) {
@@ -109,10 +112,6 @@ public class Main {
      */
     private static final void execute(Configuration config,
                                       ConnectorFactory factory) throws IOException, ConnectorException {
-        
-        // Some logging
-        System.out.println("\n++++++++++++++++++++++++++++ ACE Benchmark ++++++++++++++++++++++++++++\n");
-  
         // Identifiers
         System.out.print("\r - Preparing benchmark: creating identifiers                      ");
         Identifiers identifiers = new Identifiers();
@@ -164,7 +163,7 @@ public class Main {
                 double progress = (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d;
                 
                 // Print progress
-                System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)");
+                System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)       ");
             }
             
             // Reporting DB storage size
