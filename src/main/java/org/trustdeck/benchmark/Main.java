@@ -111,25 +111,25 @@ public class Main {
                                       ConnectorFactory factory) throws IOException, ConnectorException {
         
         // Some logging
-        System.out.println("Executing configuration: " + config.getName());
+        System.out.println("\n++++++++++++++++++++++++++++ ACE Benchmark ++++++++++++++++++++++++++++\n");
   
         // Identifiers
         System.out.print("\r - Preparing benchmark: creating identifiers                      ");
         Identifiers identifiers = new Identifiers();
-        System.out.println("\r - Preparing benchmark: creating identifiers\t\t\t\t[DONE]");
+        System.out.println("\r - Preparing benchmark: creating identifiers\t\t\t[DONE]");
 
         // Statistics
         System.out.print("\r - Preparing benchmark: creating statistics                      ");
         Statistics statistics = new Statistics(config);
-        System.out.println("\r - Preparing benchmark: creating statistics\t\t\t\t[DONE]");
+        System.out.println("\r - Preparing benchmark: creating statistics\t\t\t[DONE]");
         
         // Provider
         System.out.print("\r - Preparing benchmark: creating work provider                      ");
         WorkProvider provider = new WorkProvider(config, identifiers, statistics, factory);
-        System.out.println("\r - Preparing benchmark: creating work provider\t\t[DONE]");
+        System.out.println("\r - Preparing benchmark: creating work provider\t\t\t[DONE]");
         
         // Prepare
-        System.out.print("\r - Preparing benchmark: purge database and re-initialize            ");
+        System.out.print("\r - Preparing benchmark: purge database and re-initialize        ");
         provider.prepare();
         System.out.println("\r - Preparing benchmark: purge database and re-initialize\t[DONE]");
         
@@ -137,7 +137,7 @@ public class Main {
         System.out.println("\r - Preparing benchmark: Done");
         
         // Some logging
-        System.out.println(" - Executing configuration: " + config.getName());
+        System.out.println("\n - Executing configuration: " + config.getName());
         
         // Start workers
         statistics.start();
