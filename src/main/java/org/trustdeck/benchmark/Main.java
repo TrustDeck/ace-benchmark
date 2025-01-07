@@ -201,6 +201,6 @@ public class Main {
         factory.shutdown();
         
         // Some logging
-        System.out.println(" - Done");
+        System.out.println(" - Done\n");
     }
 }

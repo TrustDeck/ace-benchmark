@@ -163,7 +163,8 @@ public class KeycloakAuthentication {
         try {
             return threadLocalTokenManager.get().getAccessTokenString();
         } catch (Exception e) {
-            throw new HTTPException("Keycloak authentication failed. Cause: " + e.getMessage(), e);
+            return null;
+	    //throw new HTTPException("Keycloak authentication failed. Cause: " + e.getMessage(), e);
         }
     }
     
