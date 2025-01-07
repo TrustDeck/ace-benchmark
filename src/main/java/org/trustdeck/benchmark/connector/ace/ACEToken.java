@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,18 @@ package org.trustdeck.benchmark.connector.ace;
 import org.trustdeck.benchmark.connector.Token;
 
 /**
- * Authentication token
+ * Authentication token.
+ * 
+ * @author Fabian Prasser
  */
 public class ACEToken implements Token<String> {
    
-    /** Authentication token*/
+    /** Authentication token. */
     private String token;
     
     /**
-     * Create a new instance
+     * Create a new instance.
+     * 
      * @param token
      */
     public ACEToken(String token) {

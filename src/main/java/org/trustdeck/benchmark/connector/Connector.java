@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,30 @@
 package org.trustdeck.benchmark.connector;
 
 /**
- * Connector interface
+ * Connector interface.
+ * 
  * @author Fabian Prasser
  */
 public interface Connector {
 
-    /** Prepare benchmark*/
+    /** Prepare benchmark. */
     public void prepare() throws ConnectorException;
     
-    /** Create pseudonym*/
+    /** Create pseudonym. */
     public void createPseudonym(String id) throws ConnectorException;
     
-    /** Retrieve storage consumption*/
+    /** Retrieve storage consumption. */
     public String getStorageConsumption(String storageID) throws ConnectorException;
     
-    /** Read pseudonym*/
+    /** Read pseudonym. */
     public void readPseudonym(String string) throws ConnectorException;
     
-    /** Update pseudonym*/
+    /** Update pseudonym. */
     public void updatePseudonym(String string) throws ConnectorException;
     
-    /** Delete pseudonym*/
+    /** Delete pseudonym. */
     public void deletePseudonym(String string) throws ConnectorException;
     
-    /** Ping the service*/
+    /** Ping the service. */
     public void ping() throws ConnectorException;
 }

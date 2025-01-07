@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,16 +29,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.trustdeck.benchmark.connector.Connector;
 import org.trustdeck.benchmark.connector.ConnectorException;
-import org.trustdeck.benchmark.connector.ace.ACEConnector;
-import org.trustdeck.benchmark.connector.ace.ClientManager;
+import org.trustdeck.benchmark.connector.ConnectorFactory;
+import org.trustdeck.benchmark.connector.ace.ACEConnectorFactory;
 import org.yaml.snakeyaml.Yaml;
 
 /**
  * Main class of the benchmark driver.
  * 
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin MÃ¼ller, Felix N. Wirth, and Fabian Prasser
  */
 public class Main {
 
@@ -92,54 +91,52 @@ public class Main {
             }
         }
 
-        // Create connector
-        System.out.print("\r - Preparing service: creating authentication and service object");
-        Connector connector = new ACEConnector();
-        System.out.println("\r - Preparing service: creating authentication and service object\t[DONE]");
-
+        // Some logging
+        System.out.println("\n++++++++++++++++++++++++++++ ACE Benchmark ++++++++++++++++++++++++++++\n");
+        
         // Execute
+        ConnectorFactory factory = new ACEConnectorFactory();
         for (Configuration config : configs) {
-            execute(connector, config);
+            execute(config, factory);
         }
     }
     
     /**
      * Executes a configuration.
      * 
-     * @param connector the connector to use
-     * @param config the configuration object that should be used to run the benchmark
+     * @param config The configuration object that should be used to run the benchmark
+     * @param factory Connector factory
      * @throws IOException
      * @throws URISyntaxException
      * @throws ConnectorException 
      */
-    private static final void execute(Connector connector,
-                                      Configuration config) throws IOException, ConnectorException {
-               
+    private static final void execute(Configuration config,
+                                      ConnectorFactory factory) throws IOException, ConnectorException {
         // Identifiers
         System.out.print("\r - Preparing benchmark: creating identifiers                      ");
         Identifiers identifiers = new Identifiers();
-        System.out.println("\r - Preparing benchmark: creating identifiers\t\t\t\t[DONE]");
+        System.out.println("\r - Preparing benchmark: creating identifiers\t\t\t[DONE]");
 
         // Statistics
         System.out.print("\r - Preparing benchmark: creating statistics                      ");
         Statistics statistics = new Statistics(config);
-        System.out.println("\r - Preparing benchmark: creating statistics\t\t\t\t[DONE]");
+        System.out.println("\r - Preparing benchmark: creating statistics\t\t\t[DONE]");
         
         // Provider
         System.out.print("\r - Preparing benchmark: creating work provider                      ");
-        WorkProvider provider = new WorkProvider(config, identifiers, statistics);
-        System.out.println("\r - Preparing benchmark: creating work provider\t\t\t\t[DONE]");
+        WorkProvider provider = new WorkProvider(config, identifiers, statistics, factory);
+        System.out.println("\r - Preparing benchmark: creating work provider\t\t\t[DONE]");
         
         // Prepare
-        System.out.print("\r - Preparing benchmark: purge database and re-initialize            ");
-        provider.prepare(connector);
-        System.out.println("\r - Preparing benchmark: purge database and re-initialize\t\t[DONE]");
+        System.out.print("\r - Preparing benchmark: purge database and re-initialize        ");
+        provider.prepare();
+        System.out.println("\r - Preparing benchmark: purge database and re-initialize\t[DONE]");
         
         // Some logging
         System.out.println("\r - Preparing benchmark: Done");
         
         // Some logging
-        System.out.println(" - Executing configuration: " + config.getName());
+        System.out.println("\n - Executing configuration: " + config.getName());
         
         // Start workers
         statistics.start();
@@ -162,8 +159,11 @@ public class Main {
                 statistics.report(writer);
                 writer.flush();
                 
+                // Calculate Progress
+                double progress = (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d;
+                
                 // Print progress
-                System.out.print("\r   - Progress: " + (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d + " %");
+                System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)       ");
             }
             
             // Reporting DB storage size
@@ -174,7 +174,7 @@ public class Main {
             
             // End of experiment
             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
-            	System.out.println("\r   - Progress: 100 % ");
+            	System.out.println("\r   - Progress: 100 %                             ");
                 break;
             }
             
@@ -197,10 +197,10 @@ public class Main {
         	dbWriter.close();
         }
         
-        // Close client
-        ClientManager.shutdown();
+        // Close factory and free all resources
+        factory.shutdown();
         
         // Some logging
-        System.out.println(" - Done");
+        System.out.println(" - Done\n");
     }
 }

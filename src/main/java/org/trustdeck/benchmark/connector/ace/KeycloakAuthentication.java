@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
  */
 package org.trustdeck.benchmark.connector.ace;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.token.TokenManager;
 
 /**
  * Information needed for authentication.
  * 
- * @author Fabian Prasser and Armin Müller
+ * @author Fabian Prasser and Armin MÃ¼ller
  */
 public class KeycloakAuthentication {
     
@@ -44,8 +46,20 @@ public class KeycloakAuthentication {
     /** The name of Keycloak realm. */
     protected String keycloakRealmName;
     
-    /** The token manager handles Keycloak's access and refresh tokens. */
-    private TokenManager tokenmanager;
+    /** Singleton Keycloak instance. */
+    private volatile Keycloak keycloakInstance;
+    
+    /** Lock to avoid multiple initializations of Keycloak. */
+    private final ReentrantLock lock = new ReentrantLock();
+
+    /** Thread-local TokenManager; handles Keycloak's access and refresh tokens. */
+    private ThreadLocal<TokenManager> threadLocalTokenManager = ThreadLocal.withInitial(() -> {
+        if (keycloakInstance == null) {
+            throw new IllegalStateException("Keycloak instance is not initialized.");
+        }
+        
+        return keycloakInstance.tokenManager();
+    });
     
     /**
      * Basic constructor.
@@ -103,22 +117,55 @@ public class KeycloakAuthentication {
     }
     
     /**
+     *  Initialize Keycloak singleton instance.
+     */
+    private void initializeKeycloak() {
+        if (keycloakInstance == null) {
+        	// Not yet available. Create a new instance. Ensure only one is created.
+            lock.lock();
+            
+            try {
+                if (keycloakInstance == null) {
+                    keycloakInstance = Keycloak.getInstance(
+                            keycloakAuthenticationURI,
+                            keycloakRealmName,
+                            username,
+                            password,
+                            clientId,
+                            clientSecret
+                    );
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+    
+    /**
+     *  Parameter validation.
+     */
+    private void validateParameters() {
+        if (username == null || password == null || clientId == null || clientSecret == null || keycloakAuthenticationURI == null || keycloakRealmName == null) {
+            throw new IllegalArgumentException("Missing required authentication parameters.");
+        }
+    }
+    
+    /**
      * Returns an authentication token.
      * 
      * @return the authentication token as a string.
      */
     public String authenticate() throws HTTPException {
-        // Check that all necessary parameters are set
-        if (username == null || password == null || clientId == null || clientSecret == null || keycloakAuthenticationURI == null || keycloakRealmName == null) {
-            throw new NullPointerException("All parameters must not be null!");
-        }
+    	validateParameters();
+        initializeKeycloak();
         
         // Retrieve access token
-        Keycloak instance = Keycloak.getInstance(keycloakAuthenticationURI, keycloakRealmName, username, password, clientId, clientSecret);
-        tokenmanager = instance.tokenManager();
-        String accessToken = tokenmanager.getAccessTokenString();
-
-    	return accessToken;
+        try {
+            return threadLocalTokenManager.get().getAccessTokenString();
+        } catch (Exception e) {
+            return null;
+	    //throw new HTTPException("Keycloak authentication failed. Cause: " + e.getMessage(), e);
+        }
     }
     
     /**
@@ -127,6 +174,14 @@ public class KeycloakAuthentication {
      * @return a refreshed access token
      */
     public String refreshToken() {
-    	return tokenmanager.refreshToken().getToken();
+    	validateParameters();
+        initializeKeycloak();
+        
+        // Refresh access token
+        try {
+            return threadLocalTokenManager.get().refreshToken().getToken();
+        } catch (Exception e) {
+            throw new HTTPException("Failed to refresh Keycloak token. Cause: " + e.getMessage(), e);
+        }
     }
 }

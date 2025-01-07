@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ import org.trustdeck.benchmark.connector.ace.HTTPException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
- * Interface for pseudonymization service
+ * Interface for pseudonymization services.
+ * 
  * @param <S>
  * @param <T>
  * @param <U>

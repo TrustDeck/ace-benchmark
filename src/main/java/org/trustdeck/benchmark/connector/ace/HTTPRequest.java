@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import jakarta.ws.rs.core.Response;
 /**
  * This class is used to build and execute HTTP requests.
  * 
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin MÃ¼ller, Felix N. Wirth, and Fabian Prasser
  */
 public class HTTPRequest {
     
@@ -121,7 +121,7 @@ public class HTTPRequest {
      * @param parameters
      */
     public HTTPRequest(URI server, String path, HTTPRequestType requestType, String authToken, String body, HTTPMediaType bodyMediaType, Map<String, String> parameters) {
-        this.client = ClientManager.getClient();
+        this.client = HTTPClientManager.getClient();
         this.server = server;
         this.path = path;
         this.requestType = requestType;
@@ -139,67 +139,64 @@ public class HTTPRequest {
      * @return the request's response as a string
      */
     public String execute() {
-        
-        // Create target
-        // newClient might be expensive? Use one client?
-    	//Client client = ClientBuilder.newClient();
-		try {
-			WebTarget target = this.client.target(server).path(path);
-			
-			if (parameters != null && !parameters.isEmpty()) {
-				for (Entry<String, String> parameter : parameters.entrySet()) {
-					target = target.queryParam(parameter.getKey(), parameter.getValue());
-				}
-			}
-			
-			// Build request
-			Builder builder = target.request();
-			builder.header("Authorization", String.format("Bearer %s", authToken));
-			
-			// Handle media type
-			String type = null;
-			
-			switch (bodyMediaType) {
-				case APPLICATION_JSON:
-					type = MediaType.APPLICATION_JSON;
-					break;
-				case TEXT_PLAIN:
-					type = MediaType.TEXT_PLAIN;
-					break;
-				default:
-					throw new IllegalStateException("Unknown media type");
-			}
-			
-			// Execute request
-			Response response = null;
-			
-			switch (requestType) {
-				case GET:
-					response = builder.get(Response.class);
-					break;
-				case POST:
-					if (body == null || type == null) {
-						throw new IllegalArgumentException("Body and media type must not be null.");
-					}
-					response = builder.post(Entity.entity(body, type));
-					break;
-				case PUT:
-					if (body == null || type == null) {
-						throw new IllegalArgumentException("Body and media type must not be null.");
-					}
-					response = builder.put(Entity.entity(body, type));
-					break;
-				case DELETE:
-					response = builder.delete(Response.class);
-					break;
-				default:
-					throw new IllegalStateException("Unknown request type.");
-			}
-			
-			// Read and return the response entity
-			return response.readEntity(String.class);
-		} finally {
-			// Do nothing
-		}
+    	// Check if client is available. If not, the experiment might already be finished
+    	if (client == null) {
+    		return "";
+    	}
+
+        WebTarget target = this.client.target(server).path(path);
+
+        if (parameters != null && !parameters.isEmpty()) {
+            for (Entry<String, String> parameter : parameters.entrySet()) {
+                target = target.queryParam(parameter.getKey(), parameter.getValue());
+            }
+        }
+
+        // Build request
+        Builder builder = target.request();
+        builder.header("Authorization", String.format("Bearer %s", authToken));
+
+        // Handle media type
+        String type = null;
+
+        switch (bodyMediaType) {
+        case APPLICATION_JSON:
+            type = MediaType.APPLICATION_JSON;
+            break;
+        case TEXT_PLAIN:
+            type = MediaType.TEXT_PLAIN;
+            break;
+        default:
+            throw new IllegalStateException("Unknown media type");
+        }
+
+        // Execute request
+        Response response = null;
+
+        switch (requestType) {
+        case GET:
+            response = builder.get(Response.class);
+            break;
+        case POST:
+            if (body == null || type == null) {
+                throw new IllegalArgumentException("Body and media type must not be null.");
+            }
+            response = builder.post(Entity.entity(body, type));
+            break;
+        case PUT:
+            if (body == null || type == null) {
+                throw new IllegalArgumentException("Body and media type must not be null.");
+            }
+            response = builder.put(Entity.entity(body, type));
+            break;
+        case DELETE:
+            response = builder.delete(Response.class);
+            break;
+        default:
+            throw new IllegalStateException("Unknown request type.");
+        }
+
+        // Read and return the response entity
+        return response.readEntity(String.class);
     }
 }

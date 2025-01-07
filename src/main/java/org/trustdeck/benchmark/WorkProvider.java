@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@ package org.trustdeck.benchmark;
 
 import org.trustdeck.benchmark.connector.Connector;
 import org.trustdeck.benchmark.connector.ConnectorException;
+import org.trustdeck.benchmark.connector.ConnectorFactory;
 
 /**
  * Class that provides the work for the worker threads.
  * 
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin MÃ¼ller, Felix N. Wirth, and Fabian Prasser
  */
 public class WorkProvider {
     
@@ -38,9 +39,9 @@ public class WorkProvider {
     
     /** The statistics object. */
     private Statistics statistics;
-    
-    /** The connector. */
-    private Connector connector;
+
+    /** Thread local connectors*/
+    private ThreadLocal<Connector> threadLocalConnectors;
     
     /**
      * Creates a new instance.
@@ -48,13 +49,27 @@ public class WorkProvider {
      * @param config
      * @param identifiers
      * @param statistics
+     * @param factory
      */
-    public WorkProvider(Configuration config, Identifiers identifiers, Statistics statistics) {
-    	
+    public WorkProvider(Configuration config, 
+                        Identifiers identifiers, 
+                        Statistics statistics,
+                        ConnectorFactory factory) {
+        
         // Store config
         this.config = config;
         this.identifiers = identifiers;
         this.statistics = statistics;
+
+        // Prepare thread-local instances 
+        this.threadLocalConnectors =
+                ThreadLocal.withInitial(() -> {
+                    try {
+                        return factory.create();
+                    } catch (ConnectorException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
         
         // Distribution of work
         this.distribution = new WorkDistribution(config.getCreateRate(),
@@ -62,7 +77,6 @@ public class WorkProvider {
                                                  config.getUpdateRate(),
                                                  config.getDeleteRate(),
                                                  config.getPingRate());
-        
     }
     
     /**
@@ -71,11 +85,11 @@ public class WorkProvider {
      * @param connector
      * @throws ConnectorException
      */
-    public void prepare(Connector connector) throws ConnectorException {
-        this.connector = connector;
-        this.connector.prepare();
+    public void prepare() throws ConnectorException {
+
+        // Create initial pseudonym pool
         for (int i = 0; i < config.getInitialDBSize(); i++) {
-            this.connector.createPseudonym(identifiers.create());
+            threadLocalConnectors.get().createPseudonym(identifiers.create());
         }
     }
     
@@ -86,8 +100,7 @@ public class WorkProvider {
      * @throws ConnectorException
      */
     public String getDBStorageMetrics(String storageIdentifier) throws ConnectorException {
-        return this.connector.getStorageConsumption(storageIdentifier);
-        
+        return threadLocalConnectors.get().getStorageConsumption(storageIdentifier);
     }
     
     /**
@@ -96,6 +109,9 @@ public class WorkProvider {
      * @return the work
      */
     public Runnable getWork() {
+        
+        // Obtain thread-local connector
+        Connector connector = threadLocalConnectors.get();
         
         // Get the template according to the defined distribution
         switch(distribution.sample()) {
@@ -106,7 +122,12 @@ public class WorkProvider {
 	                    try {
                             connector.createPseudonym(identifiers.create());
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
 	                    statistics.addCreate();
 	                }
@@ -118,7 +139,12 @@ public class WorkProvider {
 	                    try {
                             connector.readPseudonym(identifiers.read());
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
 	                    statistics.addRead();
 	                }
@@ -130,7 +156,12 @@ public class WorkProvider {
 	                    try {
                             connector.updatePseudonym(identifiers.read());
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
 	                    statistics.addUpdate();
 	                }
@@ -142,7 +173,12 @@ public class WorkProvider {
 	                    try {
                             connector.deletePseudonym(identifiers.read());
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
 	                    statistics.addDelete();
 	                }
@@ -154,7 +190,12 @@ public class WorkProvider {
 	                    try {
                             connector.ping();
                         } catch (ConnectorException e) {
-                            throw new RuntimeException(e);
+                        	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                        		// Work submitted shortly before the benchmark was terminated might still be processed.
+                        		// Exceptions thrown by those requests can be ignored.
+                        	} else {
+                        		throw new RuntimeException(e);
+                        	}
                         }
                         statistics.addPing();
 	                }

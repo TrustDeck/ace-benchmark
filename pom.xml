@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.trustdeck</groupId>
 	<artifactId>benchmark</artifactId>
-	<version>0.5</version>
+	<version>0.6</version>
     <name>ace-benchmark</name>
 	<packaging>jar</packaging>
 	
@@ -143,7 +143,7 @@
 	</dependencies>
 	
 	<properties>
-		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>ISO-8859-1</project.reporting.outputEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 </project>

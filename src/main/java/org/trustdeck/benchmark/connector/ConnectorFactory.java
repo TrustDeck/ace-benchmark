@@ -17,13 +17,15 @@
 package org.trustdeck.benchmark.connector;
 
 /**
- * Generic token interface.
+ * A factory for connectors.
  * 
- * @param <T>
  * @author Fabian Prasser
  */
-public interface Token<T> {
+public interface ConnectorFactory {
 
-    /** Token. */
-    T getToken();
+    /** Create a connector. */
+    public Connector create() throws ConnectorException;
+
+    /** Shutdown the factory and all associated resources. */
+    public void shutdown();
 }

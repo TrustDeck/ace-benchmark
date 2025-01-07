@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,27 +22,28 @@ import jakarta.ws.rs.client.ClientBuilder;
 /**
  * Singleton class for managing the client object needed for generating requests.
  * 
- * @author Armin Müller
+ * @author Armin MÃ¼ller
  */
-public class ClientManager {
-	/** The web client object needed to create requests. Marked volatile, so that every thread sees changes made to it. */
+public class HTTPClientManager {
+    
+	/** The web client object needed to create requests. */
     private static volatile Client client;
 
     /**
      *  Private constructor prevents instantiation.
      */
-    private ClientManager() {}
+    private HTTPClientManager() {}
 
     /**
      * Retrieve or create the client object.
      * 
      * @return the client object
      */
-    public static Client getClient() {
+    static Client getClient() {
         // Double-checked-locking improves performance since thread 
     	// safety is only needed when creating the client for the first time.
     	if (client == null) {
-            synchronized (ClientManager.class) {
+            synchronized (HTTPClientManager.class) {
                 if (client == null) {
                     client = ClientBuilder.newClient();
                 }
@@ -55,7 +56,7 @@ public class ClientManager {
     /**
      * Closes the client and unsets the class object.
      */
-    public static void shutdown() {
+    static void shutdown() {
         if (client != null) {
             client.close();
             client = null;

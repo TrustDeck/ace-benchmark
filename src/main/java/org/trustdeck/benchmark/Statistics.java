@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024 Armin MÃ¼ller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import lombok.Getter;
 /**
  * This class contains the statistics collected for benchmarking.
  * 
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin MÃ¼ller, Felix N. Wirth, and Fabian Prasser
  */
 public class Statistics {
 
@@ -79,6 +79,10 @@ public class Statistics {
     
     /** Number of combined creates, reads, updates, and deletes from last statistic-gathering */
     private int lastCRUDs = 0;
+    
+    /** Number of transactions per second in the last reporting step. */
+    @Getter
+    private int lastOverallTPS = 0;
    
     /**
      * Creates a new instance.
@@ -196,6 +200,7 @@ public class Statistics {
         this.lastDeletes = currentDeletes;
         this.lastPings = currentPings;
         this.lastCRUDs = currentCRUDs;
+        this.lastOverallTPS = (int) tpsOverall;
     }
     
     /**
