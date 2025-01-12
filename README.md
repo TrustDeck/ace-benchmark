@@ -5,7 +5,7 @@
 This project implements a benchmark designed to stress test pseudonymization services and measure their throughput
 across different workload scenarios. It allows users to evaluate the performance, scalability, and stability of a
 service deployment under high loads. Through a connector abstraction, the benchmark can be applied to different
-pseudonymization services. We provide an example implementation for the pseudonymization service (ACE)[https://github.com/TrustDeck/ace].
+pseudonymization services. We provide an example implementation for the pseudonymization service [ACE](https://github.com/TrustDeck/ace).
 
 ## Features
 
