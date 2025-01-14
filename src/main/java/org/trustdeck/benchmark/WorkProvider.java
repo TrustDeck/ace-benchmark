@@ -86,7 +86,9 @@ public class WorkProvider {
      * @throws ConnectorException
      */
     public void prepare() throws ConnectorException {
-
+		// Remove old data and create benchmark table
+		threadLocalConnectors.get().prepare();
+		
         // Create initial pseudonym pool
         for (int i = 0; i < config.getInitialDBSize(); i++) {
             threadLocalConnectors.get().createPseudonym(identifiers.create());

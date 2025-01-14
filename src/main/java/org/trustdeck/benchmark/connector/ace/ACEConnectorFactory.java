@@ -73,7 +73,7 @@ public class ACEConnectorFactory implements ConnectorFactory {
         }
 
         // Prepare for the benchmark and return the connector
-        connector.prepare();
+        //connector.prepare();
         return connector;
     }
 

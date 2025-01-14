@@ -48,7 +48,7 @@ public class ACEConnector implements Connector {
     private ACEService service;
     
     /** Authentication. */
-    private KeycloakAuthentication authentication;
+    private volatile KeycloakAuthentication authentication;
     
     /** Access token. */
     private ACEToken token;
@@ -80,7 +80,8 @@ public class ACEConnector implements Connector {
                 .setKeycloakAuthenticationURI(authKeycloakURI)
                 .setKeycloakRealmName(authKeycloakRealmName)
                 .setUsername(authUsername)
-                .setPassword(authPassword);
+                .setPassword(authPassword)
+				.initialize();
         
         // Instantiate service
         this.service = new ACEService(new URI(serviceURI));

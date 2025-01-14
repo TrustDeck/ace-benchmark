@@ -45,6 +45,12 @@ public class KeycloakAuthentication {
     
     /** The name of Keycloak realm. */
     protected String keycloakRealmName;
+	
+	/** TokenManager: handles Keycloak's access and refresh tokens. */
+	protected TokenManager tokenManager;
+	
+	/** Was a token already initially issued. */
+	private volatile boolean tokenIssued = false;
     
     /** Singleton Keycloak instance. */
     private volatile Keycloak keycloakInstance;
@@ -53,13 +59,15 @@ public class KeycloakAuthentication {
     private final ReentrantLock lock = new ReentrantLock();
 
     /** Thread-local TokenManager; handles Keycloak's access and refresh tokens. */
-    private ThreadLocal<TokenManager> threadLocalTokenManager = ThreadLocal.withInitial(() -> {
-        if (keycloakInstance == null) {
-            throw new IllegalStateException("Keycloak instance is not initialized.");
-        }
+    //private ThreadLocal<TokenManager> threadLocalTokenManager = ThreadLocal.withInitial(() -> {
+    //    initializeKeycloak();
+
+	//if (keycloakInstance == null) {
+    //        throw new IllegalStateException("Keycloak instance is not initialized.");
+    //    }
         
-        return keycloakInstance.tokenManager();
-    });
+    //    return keycloakInstance.tokenManager();
+    //});
     
     /**
      * Basic constructor.
@@ -119,14 +127,16 @@ public class KeycloakAuthentication {
     /**
      *  Initialize Keycloak singleton instance.
      */
-    private void initializeKeycloak() {
-        if (keycloakInstance == null) {
+    public KeycloakAuthentication initialize() {
+        validateParameters();
+		
+		if (this.keycloakInstance == null) {
         	// Not yet available. Create a new instance. Ensure only one is created.
-            lock.lock();
+            this.lock.lock();
             
             try {
-                if (keycloakInstance == null) {
-                    keycloakInstance = Keycloak.getInstance(
+                if (this.keycloakInstance == null) {
+                    this.keycloakInstance = Keycloak.getInstance(
                             keycloakAuthenticationURI,
                             keycloakRealmName,
                             username,
@@ -136,9 +146,14 @@ public class KeycloakAuthentication {
                     );
                 }
             } finally {
-                lock.unlock();
+                this.lock.unlock();
             }
         }
+		
+		// Create token manager
+		this.tokenManager = this.keycloakInstance.tokenManager();
+		
+		return this;
     }
     
     /**
@@ -156,16 +171,30 @@ public class KeycloakAuthentication {
      * @return the authentication token as a string.
      */
     public String authenticate() throws HTTPException {
-    	validateParameters();
-        initializeKeycloak();
-        
-        // Retrieve access token
-        try {
-            return threadLocalTokenManager.get().getAccessTokenString();
-        } catch (Exception e) {
-            return null;
-	    //throw new HTTPException("Keycloak authentication failed. Cause: " + e.getMessage(), e);
-        }
+    	//validateParameters();
+        //initializeKeycloak();
+		if (!tokenIssued) {
+			// Double checked locking
+			this.lock.lock();
+			
+			// Retrieve access token
+			try {
+				String token = this.tokenManager.grantToken().getToken();
+				tokenIssued = true;
+				
+				return token;
+			} catch (Exception e) {
+				//System.out.println("KC auth failed: " + e.getMessage());
+				//e.printStackTrace();
+				return null;
+				//return this.tokenManager.getAccessTokenString();
+				//throw new HTTPException("Keycloak authentication failed. Cause: " + e.getMessage(), e);
+			} finally {
+				this.lock.unlock();
+			}
+		} else {
+			return this.tokenManager.getAccessTokenString();
+		}
     }
     
     /**
@@ -174,12 +203,12 @@ public class KeycloakAuthentication {
      * @return a refreshed access token
      */
     public String refreshToken() {
-    	validateParameters();
-        initializeKeycloak();
+    	//validateParameters();
+        //initializeKeycloak();
         
         // Refresh access token
         try {
-            return threadLocalTokenManager.get().refreshToken().getToken();
+            return this.tokenManager.refreshToken().getToken();
         } catch (Exception e) {
             throw new HTTPException("Failed to refresh Keycloak token. Cause: " + e.getMessage(), e);
         }
