@@ -1,10 +1,14 @@
 package org.trustdeck.benchmark.connector.ace;
 
+import java.io.InputStream;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.token.TokenManager;
 import org.keycloak.representations.AccessTokenResponse;
+import org.trustdeck.benchmark.Main;
+import org.yaml.snakeyaml.Yaml;
 
 public class ACETokenManager {
 
@@ -31,21 +35,36 @@ public class ACETokenManager {
     }
 
     // Initialize the ACETokenManager with Keycloak parameters
-    public synchronized void initialize(String username, String password, String clientId,
-                                        String clientSecret, String keycloakAuthenticationURI,
-                                        String keycloakRealmName) {
+    public synchronized void initialize() {
+//    									String username, String password, String clientId,
+//                                        String clientSecret, String keycloakAuthenticationURI,
+//                                        String keycloakRealmName) {
         if (this.keycloakInstance != null) {
             throw new IllegalStateException("ACETokenManager is already initialized.");
         }
+        
+        // Extract the tool configuration from the loaded configuration file
+        Yaml yaml = new Yaml();
+        InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("config.yaml");
+        Map<String, Object> yamlConfig = yaml.load(inputStream);
+        @SuppressWarnings("unchecked")
+        Map<String, String> toolConfig = (Map<String, String>) yamlConfig.get("ace");
+        
+        String authClientId = toolConfig.get("clientId");
+        String authClientSecret = toolConfig.get("clientSecret");
+        String authKeycloakURI = toolConfig.get("keycloakAuthUri");
+        String authKeycloakRealmName = toolConfig.get("keycloakRealmName");
+        String authUsername = toolConfig.get("username");
+        String authPassword = toolConfig.get("password");
 
         // Create the Keycloak instance
         this.keycloakInstance = Keycloak.getInstance(
-                keycloakAuthenticationURI,
-                keycloakRealmName,
-                username,
-                password,
-                clientId,
-                clientSecret
+        		authKeycloakURI,
+        		authKeycloakRealmName,
+        		authUsername,
+        		authPassword,
+        		authClientId,
+        		authClientSecret
         );
     }
 
@@ -79,14 +98,27 @@ public class ACETokenManager {
 
     // Refresh the access token
     private void refreshAccessToken() {
-        try {
-            TokenManager tokenManager = keycloakInstance.tokenManager();
+        TokenManager tokenManager = keycloakInstance.tokenManager();
+        long expiresIn = 0;
+        
+    	try {
             AccessTokenResponse response = tokenManager.refreshToken();
             this.accessToken = response.getToken();
+            expiresIn = response.getExpiresIn();
             // Reduce time to next refresh by 15 seconds. Convert seconds to milliseconds.
-            this.tokenExpiryTime = System.currentTimeMillis() + ((response.getExpiresIn() - 15) * 1000L); 
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to refresh the token: " + e.getMessage(), e);
+            //this.tokenExpiryTime = System.currentTimeMillis() + ((response.getExpiresIn() - 15) * 1000L); 
+        } catch (NullPointerException e) {
+        	// The keycloak code contains a bug: we need to catch this NPE here when there was no token previously generated
+            AccessTokenResponse response = tokenManager.grantToken();
+            this.accessToken = response.getToken();
+            expiresIn = response.getExpiresIn();
+            // Reduce time to next refresh by 15 seconds. Convert seconds to milliseconds.
+            //this.tokenExpiryTime = System.currentTimeMillis() + ((response.getExpiresIn() - 15) * 1000L);
+    	} catch (Exception f) {
+            throw new RuntimeException("Failed to refresh the token: " + f.getMessage(), f);
         }
+    	
+    	// Reduce time to next refresh by 15 seconds. Convert seconds to milliseconds.
+        this.tokenExpiryTime = System.currentTimeMillis() + ((expiresIn - 15) * 1000L);
     }
 }

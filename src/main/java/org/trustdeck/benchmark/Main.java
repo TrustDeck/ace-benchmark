@@ -32,6 +32,7 @@ import java.util.Map;
 import org.trustdeck.benchmark.connector.ConnectorException;
 import org.trustdeck.benchmark.connector.ConnectorFactory;
 import org.trustdeck.benchmark.connector.ace.ACEConnectorFactory;
+import org.trustdeck.benchmark.connector.ace.ACETokenManager;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -126,6 +127,11 @@ public class Main {
         System.out.print("\r - Preparing benchmark: creating work provider                      ");
         WorkProvider provider = new WorkProvider(config, identifiers, statistics, factory);
         System.out.println("\r - Preparing benchmark: creating work provider\t\t\t[DONE]");
+        
+        // Authenticate
+        System.out.print("\r - Preparing benchmark: initialize authentication                      ");
+        ACETokenManager.getInstance().initialize();
+        System.out.println("\r - Preparing benchmark: initialize authentication\t\t[DONE]");
         
         // Prepare
         System.out.print("\r - Preparing benchmark: purge database and re-initialize        ");

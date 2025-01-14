@@ -47,12 +47,12 @@ public class ACEConnectorFactory implements ConnectorFactory {
         @SuppressWarnings("unchecked")
         Map<String, String> toolConfig = (Map<String, String>) yamlConfig.get("ace");
         
-        String authClientId = toolConfig.get("clientId");
-        String authClientSecret = toolConfig.get("clientSecret");
-        String authKeycloakURI = toolConfig.get("keycloakAuthUri");
-        String authKeycloakRealmName = toolConfig.get("keycloakRealmName");
-        String authUsername = toolConfig.get("username");
-        String authPassword = toolConfig.get("password");
+//        String authClientId = toolConfig.get("clientId");
+//        String authClientSecret = toolConfig.get("clientSecret");
+//        String authKeycloakURI = toolConfig.get("keycloakAuthUri");
+//        String authKeycloakRealmName = toolConfig.get("keycloakRealmName");
+//        String authUsername = toolConfig.get("username");
+//        String authPassword = toolConfig.get("password");
  
         String serviceURI = toolConfig.get("uri");
         String serviceDomainName = toolConfig.get("domainName");
@@ -60,12 +60,13 @@ public class ACEConnectorFactory implements ConnectorFactory {
         // Create connector
         ACEConnector connector;
         try {
-            connector = new ACEConnector(authClientId,
-                                         authClientSecret,
-                                         authKeycloakURI,
-                                         authKeycloakRealmName,
-                                         authUsername,
-                                         authPassword,
+            connector = new ACEConnector(
+//            							authClientId,
+//                                         authClientSecret,
+//                                         authKeycloakURI,
+//                                         authKeycloakRealmName,
+//                                         authUsername,
+//                                         authPassword,
                                          serviceURI,
                                          serviceDomainName);
         } catch (URISyntaxException e) {

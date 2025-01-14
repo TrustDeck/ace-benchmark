@@ -48,7 +48,7 @@ public class ACEConnector implements Connector {
     private ACEService service;
     
     /** Authentication. */
-    private volatile KeycloakAuthentication authentication;
+    //private volatile KeycloakAuthentication authentication;
     
     /** Access token. */
     private ACEToken token;
@@ -64,24 +64,25 @@ public class ACEConnector implements Connector {
      * 
      * @throws URISyntaxException
      */
-    public ACEConnector(String authClientId,
-                        String authClientSecret,
-                        String authKeycloakURI,
-                        String authKeycloakRealmName,
-                        String authUsername,
-                        String authPassword,
+    public ACEConnector(
+//    					String authClientId,
+//                        String authClientSecret,
+//                        String authKeycloakURI,
+//                        String authKeycloakRealmName,
+//                        String authUsername,
+//                        String authPassword,
                         String serviceURI,
                         String serviceDomainName) throws URISyntaxException {
         
         // Authentication
-        this.authentication = new KeycloakAuthentication()
-                .setClientId(authClientId)
-                .setClientSecret(authClientSecret)
-                .setKeycloakAuthenticationURI(authKeycloakURI)
-                .setKeycloakRealmName(authKeycloakRealmName)
-                .setUsername(authUsername)
-                .setPassword(authPassword)
-				.initialize();
+//        this.authentication = new KeycloakAuthentication()
+//                .setClientId(authClientId)
+//                .setClientSecret(authClientSecret)
+//                .setKeycloakAuthenticationURI(authKeycloakURI)
+//                .setKeycloakRealmName(authKeycloakRealmName)
+//                .setUsername(authUsername)
+//                .setPassword(authPassword)
+//				.initialize();
         
         // Instantiate service
         this.service = new ACEService(new URI(serviceURI));
@@ -94,18 +95,22 @@ public class ACEConnector implements Connector {
     /**
      * Authentication mechanism. Retrieves a new token or refreshes an existing one. 
      */
-    private void authenticate() {
+//    private void authenticate() {
+//
+//        // Retrieve an access token
+//        if (this.token == null) {
+//            this.token = new ACEToken(authentication.authenticate());
+//            this.lastAuthenticated = System.currentTimeMillis();
+//            
+//        // Refresh token
+//        } else if (System.currentTimeMillis() - lastAuthenticated > DEFAULT_TOKEN_LIFETIME) {
+//            this.token = new ACEToken(authentication.refreshToken());
+//            this.lastAuthenticated = System.currentTimeMillis();
+//        }
+//    }
 
-        // Retrieve an access token
-        if (this.token == null) {
-            this.token = new ACEToken(authentication.authenticate());
-            this.lastAuthenticated = System.currentTimeMillis();
-            
-        // Refresh token
-        } else if (System.currentTimeMillis() - lastAuthenticated > DEFAULT_TOKEN_LIFETIME) {
-            this.token = new ACEToken(authentication.refreshToken());
-            this.lastAuthenticated = System.currentTimeMillis();
-        }
+    private void authenticate() {
+    	this.token = new ACEToken(ACETokenManager.getInstance().getToken());
     }
     
     /**
