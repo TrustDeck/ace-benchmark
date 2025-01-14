@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024-2025 Armin Müller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,21 +40,12 @@ public class ACEConnector implements Connector {
     
     /** Default start time for the pseudonym's validity period. */
     private static final String DEFAULT_PSEUDONYM_VALID_FROM = "2001-01-01T18:00:00";
-    
-    /** Token lifetime. */
-    private static final long DEFAULT_TOKEN_LIFETIME = 290000;
 
     /** ACE service. */
     private ACEService service;
     
-    /** Authentication. */
-    private KeycloakAuthentication authentication;
-    
     /** Access token. */
     private ACEToken token;
-    
-    /** To track token validity. */
-    private long lastAuthenticated;
     
     /** Domain to use for the benchmarking in ACE. */
     private ACEDomain domain;
@@ -64,24 +55,8 @@ public class ACEConnector implements Connector {
      * 
      * @throws URISyntaxException
      */
-    public ACEConnector(String authClientId,
-                        String authClientSecret,
-                        String authKeycloakURI,
-                        String authKeycloakRealmName,
-                        String authUsername,
-                        String authPassword,
-                        String serviceURI,
-                        String serviceDomainName) throws URISyntaxException {
-        
-        // Authentication
-        this.authentication = new KeycloakAuthentication()
-                .setClientId(authClientId)
-                .setClientSecret(authClientSecret)
-                .setKeycloakAuthenticationURI(authKeycloakURI)
-                .setKeycloakRealmName(authKeycloakRealmName)
-                .setUsername(authUsername)
-                .setPassword(authPassword);
-        
+    public ACEConnector(String serviceURI, String serviceDomainName) throws URISyntaxException {
+
         // Instantiate service
         this.service = new ACEService(new URI(serviceURI));
         
@@ -91,20 +66,10 @@ public class ACEConnector implements Connector {
     }
 
     /**
-     * Authentication mechanism. Retrieves a new token or refreshes an existing one. 
+     * Authentication mechanism. Retrieves an access token. 
      */
     private void authenticate() {
-
-        // Retrieve an access token
-        if (this.token == null) {
-            this.token = new ACEToken(authentication.authenticate());
-            this.lastAuthenticated = System.currentTimeMillis();
-            
-        // Refresh token
-        } else if (System.currentTimeMillis() - lastAuthenticated > DEFAULT_TOKEN_LIFETIME) {
-            this.token = new ACEToken(authentication.refreshToken());
-            this.lastAuthenticated = System.currentTimeMillis();
-        }
+    	this.token = new ACEToken(ACETokenManager.getInstance().getToken());
     }
     
     /**
@@ -134,7 +99,7 @@ public class ACEConnector implements Connector {
     }
     
     /**
-     * Create pseudonym.
+     * Create a pseudonym.
      * 
      * @param id the identifier used for creating the pseudonym.
      */
@@ -142,33 +107,6 @@ public class ACEConnector implements Connector {
         try {
             authenticate();
             service.createPseudonym(this.token, this.domain, new ACEPseudonym(id, DEFAULT_ID_TYPE));
-            
-        // Catch and forward errors
-        } catch (Exception e) {
-            throw new ConnectorException(e);
-        }
-    }
-    
-    /**
-     * Retrieve storage metrics.
-     * 
-     * @param storageIdentifier the name of the database that should be queried.
-     * @return the raw http response containing the storage metrics
-     */
-    public String getStorageConsumption(String storageIdentifier) throws ConnectorException {
-        try {
-            // Authenticate
-            authenticate();
-
-            // Gather storage information
-            String response = "";
-            try {
-                response = service.getStorage(token, storageIdentifier);
-            } catch (HTTPException e) {
-                // Ignore
-            }
-            
-            return response;
             
         // Catch and forward errors
         } catch (Exception e) {
@@ -255,6 +193,33 @@ public class ACEConnector implements Connector {
             if (!(e instanceof HTTPException && ((HTTPException) e).getStatusCode() == 404)) {
                 throw new ConnectorException(e);
             }
+        }
+    }
+    
+    /**
+     * Retrieve storage metrics.
+     * 
+     * @param storageIdentifier the name of the database that should be queried.
+     * @return the raw http response containing the storage metrics
+     */
+    public String getStorageConsumption(String storageIdentifier) throws ConnectorException {
+        try {
+            // Authenticate
+            authenticate();
+
+            // Gather storage information
+            String response = "";
+            try {
+                response = service.getStorage(token, storageIdentifier);
+            } catch (HTTPException e) {
+                // Ignore
+            }
+            
+            return response;
+            
+        // Catch and forward errors
+        } catch (Exception e) {
+            throw new ConnectorException(e);
         }
     }
 }

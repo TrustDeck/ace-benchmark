@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024-2025 Armin Müller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,9 @@ public class WorkProvider {
      * @throws ConnectorException
      */
     public void prepare() throws ConnectorException {
-
+		// Remove old data and create benchmark table
+		threadLocalConnectors.get().prepare();
+		
         // Create initial pseudonym pool
         for (int i = 0; i < config.getInitialDBSize(); i++) {
             threadLocalConnectors.get().createPseudonym(identifiers.create());
