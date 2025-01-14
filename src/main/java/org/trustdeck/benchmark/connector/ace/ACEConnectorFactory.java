@@ -1,6 +1,6 @@
 /*
  * ACE-Benchmark Driver
- * Copyright 2024 Armin Müller and contributors.
+ * Copyright 2024-2025 Armin Müller and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,13 +46,6 @@ public class ACEConnectorFactory implements ConnectorFactory {
         Map<String, Object> yamlConfig = yaml.load(inputStream);
         @SuppressWarnings("unchecked")
         Map<String, String> toolConfig = (Map<String, String>) yamlConfig.get("ace");
-        
-//        String authClientId = toolConfig.get("clientId");
-//        String authClientSecret = toolConfig.get("clientSecret");
-//        String authKeycloakURI = toolConfig.get("keycloakAuthUri");
-//        String authKeycloakRealmName = toolConfig.get("keycloakRealmName");
-//        String authUsername = toolConfig.get("username");
-//        String authPassword = toolConfig.get("password");
  
         String serviceURI = toolConfig.get("uri");
         String serviceDomainName = toolConfig.get("domainName");
@@ -60,21 +53,11 @@ public class ACEConnectorFactory implements ConnectorFactory {
         // Create connector
         ACEConnector connector;
         try {
-            connector = new ACEConnector(
-//            							authClientId,
-//                                         authClientSecret,
-//                                         authKeycloakURI,
-//                                         authKeycloakRealmName,
-//                                         authUsername,
-//                                         authPassword,
-                                         serviceURI,
-                                         serviceDomainName);
+            connector = new ACEConnector(serviceURI, serviceDomainName);
         } catch (URISyntaxException e) {
             throw new ConnectorException(e);
         }
-
-        // Prepare for the benchmark and return the connector
-        //connector.prepare();
+        
         return connector;
     }
 
