@@ -84,9 +84,13 @@ public class ACEConnector implements Connector {
             // Remove old data from ACE
             try {
                 service.clearTables(this.token);
+		Thread.sleep(15000);
+		service.deleteRoles(this.token, this.domain);
             } catch (HTTPException e) {
                 // Ignore
-            }
+            } catch (InterruptedException f) {
+				// Ignore
+			}
     
             // Refresh access token (since the old-data-removal can take a while) and create the domain
             authenticate();

@@ -85,6 +85,16 @@ public interface PseudonymizationService<S extends Token<?>, T extends Domain, U
     void clearTables(S token) throws URISyntaxException, HTTPException;
 
     /**
+     * Remove roles that are not needed anymore.
+     *
+     * @param token
+     * @param domain
+     * @throws URISyntaxException
+     * @throws HTTPException
+     */
+    void deleteRoles(S token, T domain) throws URISyntaxException, HTTPException;
+
+    /**
      * Get table storage usage.
      * 
      * @param token

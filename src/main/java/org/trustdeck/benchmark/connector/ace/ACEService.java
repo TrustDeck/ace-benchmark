@@ -165,7 +165,22 @@ public class ACEService implements PseudonymizationService<ACEToken, ACEDomain, 
         request = new HTTPRequest(service, "/table/auditevent", HTTPRequestType.DELETE, token.getToken(), null);
         request.execute();
     }
-    
+
+    /**
+     * Remove roles that are not needed anymore.
+     *
+     * @param token
+     * @param domain
+     * @throws URISyntaxException
+     * @throws HTTPException
+     */
+    @Override
+    public void deleteRoles(ACEToken token, ACEDomain domain) throws URISyntaxException, HTTPException {
+        // Build the request and execute it
+	HTTPRequest request = new HTTPRequest(service, "/roles/" + domain.getName(), HTTPRequestType.DELETE, token.getToken(), null);
+        request.execute();
+    }
+
     /**
      * Get table storage usage.
      * 
