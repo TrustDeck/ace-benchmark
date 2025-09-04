@@ -138,7 +138,7 @@
 		<dependency>
 			<groupId>org.trustdeck</groupId>
 			<artifactId>client</artifactId>
-			<version>0.8.1-BETA</version>
+			<version>0.8.4-BETA</version>
 		</dependency>
 
 		<dependency>

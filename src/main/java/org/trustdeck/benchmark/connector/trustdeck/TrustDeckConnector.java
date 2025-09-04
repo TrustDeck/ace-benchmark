@@ -114,16 +114,17 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.ping();
             log.debug("\nPing successful");
-        } catch (Exception e) {
-//            if (e instanceof TrustDeckClientLibraryException) {
-//                if (((TrustDeckClientLibraryException) e).getResponseStatusCode().value() == 404) {
-//                    // ignore 404 error, it is okay if endpoint does not exist
-//                }
-//                log.debug("Ping failed due to a TrustDeck Client Exception");
-//            }
-            throw new BenchmarkException(e);
+        } catch (TrustDeckClientLibraryException e) {
+                if (e.getResponseStatusCode().value() == 404) {
+                    // Ignore 404 errors
+                    return;
+                }
+                log.info("\nPing failed :{}",e.getResponseStatusCode().value());
+            } catch (Exception e) {
+                throw new BenchmarkException(e);
+            }
         }
-    }
+
 
 //------------------------------------- Domain Operations---------------------------------------------------------------------------------------
 
@@ -148,7 +149,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().get(domain.getName());
         } catch (TrustDeckClientLibraryException e) {
-            log.error("\nDomain read failed for domain:{}", domain.getName());
+            log.info("\nDomain read failed for domain:{}", domain.getName());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -165,7 +166,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().update(domainName, domain);
         } catch (TrustDeckClientLibraryException e) {
-            log.error("\nDomain update failed for domain:{}", domainName);
+            log.info("\nDomain update failed for domain:{}", domainName);
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -182,7 +183,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().delete(domain.getName(), true);
         } catch (TrustDeckClientLibraryException e) {
-            log.error("\nDomain deletion failed for domain:{}", domain.getName());
+            log.info("\nDomain deletion failed for domain:{}", domain.getName());
         } catch (Exception e) {
             {
                 throw new BenchmarkException(e);
@@ -211,7 +212,7 @@ public class TrustDeckConnector implements Connector {
                 // Ignore 404 errors
                 return;
             }
-            log.debug("\nPseudonym creation for id:{} failed :{}", id, e.getMessage());
+            log.info("\nPseudonym creation failed {}", e.getResponseStatusCode().value());
 
         } catch (Exception e) {
             throw new BenchmarkException(e);
@@ -237,7 +238,7 @@ public class TrustDeckConnector implements Connector {
                 // Ignore 404 errors
                 return;
             }
-            log.warn("\nPseudonym retrieval for id:{} failed :{}", id, e.getMessage());
+            log.info("\nPseudonym retrieval for id:{} failed :{}", id, e.getResponseStatusCode().value());
 
         } catch (Exception e) {
             throw new BenchmarkException(e);
@@ -262,7 +263,7 @@ public class TrustDeckConnector implements Connector {
                 //ignore
                 return;
             }
-            log.warn("\nPseudonym update for id:{} failed :{}", id, e.getMessage());
+            log.info("\nPseudonym update for id:{} failed :{}", id, e.getResponseStatusCode().value());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -283,7 +284,7 @@ public class TrustDeckConnector implements Connector {
                 //ignore
                 return;
             }
-            log.warn("\nPseudonym deletion for id:{} failed :{}", id, e.getMessage());
+            log.info("\nPseudonym deletion for id:{} failed :{}", id, e.getResponseStatusCode().value());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
