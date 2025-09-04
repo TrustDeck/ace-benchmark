@@ -39,27 +39,41 @@ import java.time.LocalDateTime;
 @Slf4j
 public class TrustDeckConnector implements Connector {
 
-    /** Default domain prefix. */
+    /**
+     * Default domain prefix.
+     */
     private static final String DEFAULT_DOMAIN_PREFIX = "PA-";
 
-    /** Default start time for the domain's validity period. */
+    /**
+     * Default start time for the domain's validity period.
+     */
     private static final LocalDateTime DEFAULT_DOMAIN_VALID_FROM = LocalDateTime.parse("2000-01-01T18:00:00");
 
-    /** Default idType. */
+    /**
+     * Default idType.
+     */
     private static final String DEFAULT_ID_TYPE = "TestType";
 
-    /** Default start time for the pseudonym's validity period. */
+    /**
+     * Default start time for the pseudonym's validity period.
+     */
     private static final LocalDateTime DEFAULT_PSEUDONYM_VALID_FROM = LocalDateTime.parse("2001-01-01T18:00:00");
 
-    /** The domain used for all pseudonym operations */
+    /**
+     * The domain used for all pseudonym operations
+     */
     private final Domain domain;
 
-    /** TrustDeck client instance for interacting with the TrustDeck API */
+    /**
+     * TrustDeck client instance for interacting with the TrustDeck API
+     */
     @Getter
     private final TrustDeckClient trustDeckClient;
 
 
-    /** Create a new instance of the connector. */
+    /**
+     * Create a new instance of the connector.
+     */
     public TrustDeckConnector(TrustDeckClient trustDeckClient, String serviceDomainName) {
 
         // Prepare domain
@@ -73,7 +87,7 @@ public class TrustDeckConnector implements Connector {
     /**
      * Prepare for benchmark.
      * Remove old data.
-    */
+     */
     public void prepare() throws BenchmarkException {
         try {
             try {
@@ -99,7 +113,7 @@ public class TrustDeckConnector implements Connector {
     public void ping() throws BenchmarkException {
         try {
             this.trustDeckClient.ping();
-            log.info("Ping successful");
+            log.debug("\nPing successful");
         } catch (Exception e) {
 //            if (e instanceof TrustDeckClientLibraryException) {
 //                if (((TrustDeckClientLibraryException) e).getResponseStatusCode().value() == 404) {
@@ -119,15 +133,10 @@ public class TrustDeckConnector implements Connector {
      * @param domain the object to be created
      */
     @Override
-    public void createDomain(Domain domain) throws BenchmarkException {
-        try {
-            this.trustDeckClient.domains().create(domain);
-        } catch (Exception e) {
-            if (!(e instanceof TrustDeckClientLibraryException)) {
-                throw new BenchmarkException(e);
-            }
-        }
+    public void createDomain(Domain domain) {
+        this.trustDeckClient.domains().create(domain); //Exception handled by caller
     }
+
 
     /**
      * Reads a domain from TrustDeck.
@@ -138,8 +147,10 @@ public class TrustDeckConnector implements Connector {
     public void readDomain(Domain domain) throws BenchmarkException {
         try {
             this.trustDeckClient.domains().get(domain.getName());
+        } catch (TrustDeckClientLibraryException e) {
+            log.error("\nDomain read failed for domain:{}", domain.getName());
         } catch (Exception e) {
-                throw new BenchmarkException(e);
+            throw new BenchmarkException(e);
         }
     }
 
@@ -147,14 +158,16 @@ public class TrustDeckConnector implements Connector {
      * Updates an existing domain in TrustDeck.
      *
      * @param domainName the name of the domain to update
-     * @param domain the domain object containing updated information
+     * @param domain     the domain object containing updated information
      */
     @Override
     public void updateDomain(String domainName, Domain domain) throws BenchmarkException {
         try {
             this.trustDeckClient.domains().update(domainName, domain);
+        } catch (TrustDeckClientLibraryException e) {
+            log.error("\nDomain update failed for domain:{}", domainName);
         } catch (Exception e) {
-                throw new BenchmarkException(e);
+            throw new BenchmarkException(e);
         }
     }
 
@@ -168,8 +181,10 @@ public class TrustDeckConnector implements Connector {
 
         try {
             this.trustDeckClient.domains().delete(domain.getName(), true);
+        } catch (TrustDeckClientLibraryException e) {
+            log.error("\nDomain deletion failed for domain:{}", domain.getName());
         } catch (Exception e) {
-            if (!(e instanceof TrustDeckClientLibraryException)) {
+            {
                 throw new BenchmarkException(e);
             }
         }
@@ -177,8 +192,6 @@ public class TrustDeckConnector implements Connector {
 
 
 //------------------------------Pseudonym Operations--------------------------------------------------------
-
-
 
 
     /**
@@ -194,11 +207,17 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.pseudonyms(this.domain.getName()).create(identifierItem, false);
         } catch (TrustDeckClientLibraryException e) {
-            log.error("Pseudonym creation failed ", e);
-        } catch (Exception e){
+            if (e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
+                return;
+            }
+            log.debug("\nPseudonym creation for id:{} failed :{}", id, e.getMessage());
+
+        } catch (Exception e) {
             throw new BenchmarkException(e);
         }
     }
+
 
     /**
      * Reads a pseudonym from the specified domain.
@@ -212,9 +231,15 @@ public class TrustDeckConnector implements Connector {
         IdentifierItem identifierItem = IdentifierItem.builder().identifier(id).idType(DEFAULT_ID_TYPE).build();
 
         try {
-            Pseudonym fetchedPseudonym = this.trustDeckClient.pseudonyms(this.domain.getName()).get(identifierItem);
-            log.debug("The retrieved Pseudonym is : {} ", fetchedPseudonym);
-        } catch (TrustDeckResponseException e) {
+            this.trustDeckClient.pseudonyms(this.domain.getName()).get(identifierItem);
+        } catch (TrustDeckClientLibraryException e) {
+            if (e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
+                return;
+            }
+            log.warn("\nPseudonym retrieval for id:{} failed :{}", id, e.getMessage());
+
+        } catch (Exception e) {
             throw new BenchmarkException(e);
         }
     }
@@ -231,7 +256,13 @@ public class TrustDeckConnector implements Connector {
             IdentifierItem identifierItem = IdentifierItem.builder().identifier(id).idType(DEFAULT_ID_TYPE).build();
             Pseudonym updatePseudonym = Pseudonym.builder().identifierItem(identifierItem).validFrom(DEFAULT_PSEUDONYM_VALID_FROM).build();
             this.trustDeckClient.pseudonyms(this.domain.getName()).update(identifierItem, updatePseudonym);
-            log.debug(" Update Pseudonym successful for identifier :{} ", id);
+            log.debug(" Pseudonym Update successful for identifier :{} ", id);
+        } catch (TrustDeckClientLibraryException e) {
+            if (e.getResponseStatusCode().value() == 404) {
+                //ignore
+                return;
+            }
+            log.warn("\nPseudonym update for id:{} failed :{}", id, e.getMessage());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -248,6 +279,12 @@ public class TrustDeckConnector implements Connector {
             IdentifierItem identifierItem = IdentifierItem.builder().identifier(id).idType(DEFAULT_ID_TYPE).build();
             this.trustDeckClient.pseudonyms(domain.getName()).delete(identifierItem);
         } catch (TrustDeckClientLibraryException e) {
+            if (e.getResponseStatusCode().value() == 404) {
+                //ignore
+                return;
+            }
+            log.warn("\nPseudonym deletion for id:{} failed :{}", id, e.getMessage());
+        } catch (Exception e) {
             throw new BenchmarkException(e);
         }
     }
@@ -260,7 +297,7 @@ public class TrustDeckConnector implements Connector {
      * Clears all tables in the database.
      */
     @Override
-    public void clearTables() throws TrustDeckClientLibraryException{
+    public void clearTables() throws TrustDeckClientLibraryException {
         this.trustDeckClient.dbMaintenance().clearTables();
     }
 
@@ -269,10 +306,10 @@ public class TrustDeckConnector implements Connector {
      *
      * @param domain the domain whose rights and roles should be deleted
      * @throws TrustDeckClientLibraryException if there is an error in the TrustDeck client
-     * @throws TrustDeckResponseException if there is an error in the TrustDeck response
+     * @throws TrustDeckResponseException      if there is an error in the TrustDeck response
      */
     @Override
-    public void deleteDomainRightsAndRoles(Domain domain) throws TrustDeckClientLibraryException{
+    public void deleteDomainRightsAndRoles(Domain domain) throws TrustDeckClientLibraryException {
         this.trustDeckClient.dbMaintenance().deleteDomainRightsAndRoles(domain);
     }
 
@@ -288,7 +325,7 @@ public class TrustDeckConnector implements Connector {
         } catch (Exception e) {
             if (e instanceof TrustDeckClientLibraryException) {
                 // Ignore TrustDeck client exceptions
-                return null;
+                return "";
             }
             throw new BenchmarkException(e);
         }

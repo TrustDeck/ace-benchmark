@@ -23,25 +23,25 @@ package org.trustdeck.benchmark.connector;
  */
 public class BenchmarkException extends Exception {
 
-    /** Status code. */
-    private int statusCode = 0;
+    /** SVUID */
+    private static final long serialVersionUID = -3894908680128888153L;
 
     /**
-     * New instance.
+     * Constructor with cause
      *
-     * @param e
+     * @param e the cause of this exception
      */
     public BenchmarkException(Exception e) {
         super(e);
     }
 
-
-
-
-    /** SVUID */
-    private static final long serialVersionUID = -3894908680128888153L;
-
-    public BenchmarkException(String message, Throwable cause) {
-        super(message, cause);
+    /**
+     * Constructor with message and cause
+     *
+     * @param message the error message
+     * @param e the cause of this exception
+     */
+    public BenchmarkException(String message, Exception e) {
+        super(message, e);
     }
 }

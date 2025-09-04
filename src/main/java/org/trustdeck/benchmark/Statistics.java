@@ -220,25 +220,24 @@ public class Statistics {
        // Derive parameters
        long domainSize, domainRecordCount, domainDBSize, pseudonymSize, pseudonymRecordCount, pseudonymDBSize, auditeventSize, auditeventRecordCount, auditeventDBSize;
        double domainBytesPerRecord, pseudonymBytesPerRecord, auditeventBytesPerRecord;
-       try {
-    	   domainSize = Long.parseLong(d.substring(d.indexOf("tableSize: ") + "tableSize: ".length(), d.indexOf(", recordCount:")).trim());
-	       domainRecordCount = Long.parseLong(d.substring(d.indexOf("recordCount: ") + "recordCount: ".length(), d.indexOf(", totalSize:")).trim());
-	       domainDBSize = Long.parseLong(d.substring(d.indexOf("totalSize: ") + "totalSize: ".length(), d.length()).trim());
-	       domainBytesPerRecord = (double) domainSize / (double) domainRecordCount;
 
-	       pseudonymSize = Long.parseLong(p.substring(p.indexOf("tableSize: ") + "tableSize: ".length(), p.indexOf(", recordCount:")).trim());
-	       pseudonymRecordCount = Long.parseLong(p.substring(p.indexOf("recordCount: ") + "recordCount: ".length(), p.indexOf(", totalSize:")).trim());
-	       pseudonymDBSize = Long.parseLong(p.substring(p.indexOf("totalSize: ") + "totalSize: ".length(), p.length()).trim());
-	       pseudonymBytesPerRecord = (double) pseudonymSize / (double) pseudonymRecordCount;
+           // Process domain metrics
+           domainSize = Long.parseLong(d.substring(d.indexOf("tableSize: ") + "tableSize: ".length(), d.indexOf(", recordCount:")).trim());
+           domainRecordCount = Long.parseLong(d.substring(d.indexOf("recordCount: ") + "recordCount: ".length(), d.indexOf(", totalSize:")).trim());
+           domainDBSize = Long.parseLong(d.substring(d.indexOf("totalSize: ") + "totalSize: ".length()).trim());
+           domainBytesPerRecord = (double) domainSize / (double) domainRecordCount;
 
-	       auditeventSize = Long.parseLong(a.substring(a.indexOf("tableSize: ") + "tableSize: ".length(), a.indexOf(", recordCount:")).trim());
-	       auditeventRecordCount = Long.parseLong(a.substring(a.indexOf("recordCount: ") + "recordCount: ".length(), a.indexOf(", totalSize:")).trim());
-	       auditeventDBSize = Long.parseLong(a.substring(a.indexOf("totalSize: ") + "totalSize: ".length(), a.length()).trim());
-	       auditeventBytesPerRecord = (double) auditeventSize / (double) auditeventRecordCount;
-       } catch (StringIndexOutOfBoundsException e) {
-    	   // Abort
-    	   return;
-       }
+           // Process pseudonym metrics
+           pseudonymSize = Long.parseLong(p.substring(p.indexOf("tableSize: ") + "tableSize: ".length(), p.indexOf(", recordCount:")).trim());
+           pseudonymRecordCount = Long.parseLong(p.substring(p.indexOf("recordCount: ") + "recordCount: ".length(), p.indexOf(", totalSize:")).trim());
+           pseudonymDBSize = Long.parseLong(p.substring(p.indexOf("totalSize: ") + "totalSize: ".length()).trim());
+           pseudonymBytesPerRecord = (double) pseudonymSize / (double) pseudonymRecordCount;
+
+           // Process audit event metrics
+           auditeventSize = Long.parseLong(a.substring(a.indexOf("tableSize: ") + "tableSize: ".length(), a.indexOf(", recordCount:")).trim());
+           auditeventRecordCount = Long.parseLong(a.substring(a.indexOf("recordCount: ") + "recordCount: ".length(), a.indexOf(", totalSize:")).trim());
+           auditeventDBSize = Long.parseLong(a.substring(a.indexOf("totalSize: ") + "totalSize: ".length()).trim());
+           auditeventBytesPerRecord = (double) auditeventSize / (double) auditeventRecordCount;
 
        // Print header
        if (lastTimeDB == 0) {
