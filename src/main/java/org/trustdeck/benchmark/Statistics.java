@@ -20,10 +20,9 @@ package org.trustdeck.benchmark;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.trustdeck.benchmark.connector.ConnectorException;
-
 import lombok.Getter;
+
+import org.trustdeck.benchmark.connector.BenchmarkException;
 
 /**
  * This class contains the statistics collected for benchmarking.
@@ -205,19 +204,19 @@ public class Statistics {
     
     /**
     * Reporting DB storage. NOT thread safe.
-    * 
-    * @throws IOException 
-     * @throws ConnectorException 
+    *
+    * @throws IOException
+     * @throws BenchmarkException
     */
-   public void reportDBStorage(Writer writer, WorkProvider provider) throws ConnectorException, IOException {
-	   
+   public void reportDBStorage(Writer writer, WorkProvider provider) throws BenchmarkException, IOException {
+
        // Collect data
        long currentTime = System.currentTimeMillis();
-       
+
        String d = provider.getDBStorageMetrics("domain");
        String p = provider.getDBStorageMetrics("pseudonym");
        String a = provider.getDBStorageMetrics("auditevent");
-       
+
        // Derive parameters
        long domainSize, domainRecordCount, domainDBSize, pseudonymSize, pseudonymRecordCount, pseudonymDBSize, auditeventSize, auditeventRecordCount, auditeventDBSize;
        double domainBytesPerRecord, pseudonymBytesPerRecord, auditeventBytesPerRecord;
@@ -226,12 +225,12 @@ public class Statistics {
 	       domainRecordCount = Long.parseLong(d.substring(d.indexOf("recordCount: ") + "recordCount: ".length(), d.indexOf(", totalSize:")).trim());
 	       domainDBSize = Long.parseLong(d.substring(d.indexOf("totalSize: ") + "totalSize: ".length(), d.length()).trim());
 	       domainBytesPerRecord = (double) domainSize / (double) domainRecordCount;
-	       
+
 	       pseudonymSize = Long.parseLong(p.substring(p.indexOf("tableSize: ") + "tableSize: ".length(), p.indexOf(", recordCount:")).trim());
 	       pseudonymRecordCount = Long.parseLong(p.substring(p.indexOf("recordCount: ") + "recordCount: ".length(), p.indexOf(", totalSize:")).trim());
 	       pseudonymDBSize = Long.parseLong(p.substring(p.indexOf("totalSize: ") + "totalSize: ".length(), p.length()).trim());
 	       pseudonymBytesPerRecord = (double) pseudonymSize / (double) pseudonymRecordCount;
-	       
+
 	       auditeventSize = Long.parseLong(a.substring(a.indexOf("tableSize: ") + "tableSize: ".length(), a.indexOf(", recordCount:")).trim());
 	       auditeventRecordCount = Long.parseLong(a.substring(a.indexOf("recordCount: ") + "recordCount: ".length(), a.indexOf(", totalSize:")).trim());
 	       auditeventDBSize = Long.parseLong(a.substring(a.indexOf("totalSize: ") + "totalSize: ".length(), a.length()).trim());
@@ -240,10 +239,10 @@ public class Statistics {
     	   // Abort
     	   return;
        }
-       
+
        // Print header
        if (lastTimeDB == 0) {
-           
+
            // Print parameters
            StringBuilder builder = new StringBuilder();
            builder.append("Time").append(";");
@@ -254,7 +253,7 @@ public class Statistics {
            builder.append("Database size").append("\n");
            writer.write(builder.toString());
        }
-       
+
        // Print parameters
        StringBuilder builder = new StringBuilder();
        builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
@@ -263,23 +262,23 @@ public class Statistics {
        builder.append(domainRecordCount).append(";");
        builder.append(domainBytesPerRecord).append(";");
        builder.append(domainDBSize).append("\n");
-       
+
        builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
        builder.append("pseudonym").append(";");
        builder.append(pseudonymSize).append(";");
        builder.append(pseudonymRecordCount).append(";");
        builder.append(pseudonymBytesPerRecord).append(";");
        builder.append(pseudonymDBSize).append("\n");
-       
+
        builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
        builder.append("auditevent").append(";");
        builder.append(auditeventSize).append(";");
        builder.append(auditeventRecordCount).append(";");
        builder.append(auditeventBytesPerRecord).append(";");
        builder.append(auditeventDBSize).append("\n");
-       
+
        writer.write(builder.toString());
-       
+
        // Store
        this.lastTimeDB = currentTime;
    }

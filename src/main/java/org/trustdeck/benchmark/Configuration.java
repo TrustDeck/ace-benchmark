@@ -29,7 +29,11 @@ public class Configuration {
     
     /** Create rate in percent. */
     private final int createRate;
-    
+
+    public int getCreateRate() {
+        return createRate;
+    }
+
     /** Read rate in percent. */
     private final int readRate;
     

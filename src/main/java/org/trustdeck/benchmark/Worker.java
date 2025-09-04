@@ -29,9 +29,7 @@ public class Worker extends Thread {
     
     /**
      * Creates a new instance.
-     * 
-     * @param authentication
-     * @param service
+
      * @param provider
      */
     public Worker(WorkProvider provider) {

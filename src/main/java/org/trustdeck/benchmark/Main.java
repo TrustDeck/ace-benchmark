@@ -28,12 +28,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.trustdeck.benchmark.connector.ConnectorException;
-import org.trustdeck.benchmark.connector.ConnectorFactory;
-import org.trustdeck.benchmark.connector.ace.ACEConnectorFactory;
-import org.trustdeck.benchmark.connector.ace.ACETokenManager;
 import org.yaml.snakeyaml.Yaml;
+
+import org.trustdeck.benchmark.connector.BenchmarkException;
+import org.trustdeck.benchmark.connector.trustdeck.TrustDeckConnectorFactory;
+import org.trustdeck.benchmark.connector.ConnectorFactory;
+
 
 /**
  * Main class of the benchmark driver.
@@ -42,7 +42,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class Main {
 
-    public static void main(String[] args) throws URISyntaxException, IOException, ConnectorException {
+    public static void main(String[] args) throws IOException, BenchmarkException {
     	
     	// Load configuration from file
         Yaml yaml = new Yaml();
@@ -94,10 +94,15 @@ public class Main {
 
         // Some logging
         System.out.println("\n++++++++++++++++++++++++++++ ACE Benchmark ++++++++++++++++++++++++++++\n");
-        
-        // Execute
-        ConnectorFactory factory = new ACEConnectorFactory();
-        for (Configuration config : configs) {
+
+    // Log total number of configs
+        System.out.println("Total configurations to run: " + configs.size());
+
+        ConnectorFactory factory = new TrustDeckConnectorFactory();
+        for (int i = 0; i < configs.size(); i++) {
+            Configuration config = configs.get(i);
+            System.out.println("Running configuration " + (i + 1) + " of " + configs.size() +
+                    ": " + config.getName() + " (" + (configs.size() - i - 1) + " left after this)");
             execute(config, factory);
         }
     }
@@ -106,13 +111,12 @@ public class Main {
      * Executes a configuration.
      * 
      * @param config The configuration object that should be used to run the benchmark
-     * @param factory Connector factory
      * @throws IOException
      * @throws URISyntaxException
-     * @throws ConnectorException 
+     * @throws BenchmarkException
      */
     private static final void execute(Configuration config,
-                                      ConnectorFactory factory) throws IOException, ConnectorException {
+                                      ConnectorFactory factory) throws IOException, BenchmarkException {
         // Identifiers
         System.out.print("\r - Preparing benchmark: creating identifiers                      ");
         Identifiers identifiers = new Identifiers();
@@ -128,11 +132,7 @@ public class Main {
         WorkProvider provider = new WorkProvider(config, identifiers, statistics, factory);
         System.out.println("\r - Preparing benchmark: creating work provider\t\t\t[DONE]");
         
-        // Authenticate
-        System.out.print("\r - Preparing benchmark: initialize authentication                      ");
-        ACETokenManager.getInstance().initialize();
-        System.out.println("\r - Preparing benchmark: initialize authentication\t\t[DONE]");
-        
+
         // Prepare
         System.out.print("\r - Preparing benchmark: purge database and re-initialize        ");
         provider.prepare();
@@ -177,7 +177,7 @@ public class Main {
                 statistics.reportDBStorage(dbWriter, provider);
                 dbWriter.flush();
             }
-            
+
             // End of experiment
             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
             	System.out.println("\r   - Progress: 100 %                             ");
@@ -203,9 +203,9 @@ public class Main {
         	dbWriter.close();
         }
         
-        // Close factory and free all resources
-        factory.shutdown();
-        
+//        // Close factory and free all resources
+//        factory.shutdown();
+
         // Some logging
         System.out.println(" - Done\n");
     }

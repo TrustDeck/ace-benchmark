@@ -17,21 +17,31 @@
 package org.trustdeck.benchmark.connector;
 
 /**
- * Connector exception.
- * 
+ * This class handles exceptions thrown by the Benchmark app.
+ *
  * @author Fabian Prasser
  */
-public class ConnectorException extends Exception {
+public class BenchmarkException extends Exception {
+
+    /** Status code. */
+    private int statusCode = 0;
 
     /**
      * New instance.
-     * 
+     *
      * @param e
      */
-    public ConnectorException(Exception e) {
+    public BenchmarkException(Exception e) {
         super(e);
     }
 
+
+
+
     /** SVUID */
     private static final long serialVersionUID = -3894908680128888153L;
+
+    public BenchmarkException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

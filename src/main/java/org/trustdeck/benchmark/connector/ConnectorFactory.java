@@ -24,8 +24,8 @@ package org.trustdeck.benchmark.connector;
 public interface ConnectorFactory {
 
     /** Create a connector. */
-    public Connector create() throws ConnectorException;
+    public Connector create() throws BenchmarkException;
 
-    /** Shutdown the factory and all associated resources. */
-    public void shutdown();
+
 }
+

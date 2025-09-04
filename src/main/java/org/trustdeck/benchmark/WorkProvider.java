@@ -18,7 +18,7 @@
 package org.trustdeck.benchmark;
 
 import org.trustdeck.benchmark.connector.Connector;
-import org.trustdeck.benchmark.connector.ConnectorException;
+import org.trustdeck.benchmark.connector.BenchmarkException;
 import org.trustdeck.benchmark.connector.ConnectorFactory;
 
 /**
@@ -44,15 +44,15 @@ public class WorkProvider {
     private ThreadLocal<Connector> threadLocalConnectors;
     
     /**
-     * Creates a new instance.
-     * 
-     * @param config
-     * @param identifiers
-     * @param statistics
-     * @param factory
-     */
-    public WorkProvider(Configuration config, 
-                        Identifiers identifiers, 
+	 * Creates a new instance.
+	 *
+	 * @param config
+	 * @param identifiers
+	 * @param statistics
+	 * @param factory
+	 */
+    public WorkProvider(Configuration config,
+                        Identifiers identifiers,
                         Statistics statistics,
                         ConnectorFactory factory) {
         
@@ -61,16 +61,15 @@ public class WorkProvider {
         this.identifiers = identifiers;
         this.statistics = statistics;
 
-        // Prepare thread-local instances 
-        this.threadLocalConnectors =
-                ThreadLocal.withInitial(() -> {
-                    try {
-                        return factory.create();
-                    } catch (ConnectorException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-        
+        // Prepare thread-local instances
+		this.threadLocalConnectors =
+				ThreadLocal.withInitial(() -> {
+					try {
+						return factory.create();
+					} catch (BenchmarkException e) {
+						throw new RuntimeException(e);
+					}
+				});
         // Distribution of work
         this.distribution = new WorkDistribution(config.getCreateRate(),
                                                  config.getReadRate(),
@@ -81,30 +80,28 @@ public class WorkProvider {
     
     /**
      * Prepare the benchmark run.
-     * 
-     * @param connector
-     * @throws ConnectorException
+     * @throws BenchmarkException
      */
-    public void prepare() throws ConnectorException {
+    public void prepare() throws BenchmarkException {
 		// Remove old data and create benchmark table
 		threadLocalConnectors.get().prepare();
-		
+
         // Create initial pseudonym pool
         for (int i = 0; i < config.getInitialDBSize(); i++) {
             threadLocalConnectors.get().createPseudonym(identifiers.create());
         }
     }
-    
+
     /**
      * Get storage metrics.
      * 
      * @param storageIdentifier
-     * @throws ConnectorException
+     * @throws BenchmarkException
      */
-    public String getDBStorageMetrics(String storageIdentifier) throws ConnectorException {
+    public String getDBStorageMetrics(String storageIdentifier) throws BenchmarkException {
         return threadLocalConnectors.get().getStorageConsumption(storageIdentifier);
     }
-    
+
     /**
      * Returns the next work item.
      * 
@@ -123,7 +120,7 @@ public class WorkProvider {
 	                public void run() {
 	                    try {
                             connector.createPseudonym(identifiers.create());
-                        } catch (ConnectorException e) {
+                        } catch (BenchmarkException e) {
                         	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
                         		// Work submitted shortly before the benchmark was terminated might still be processed.
                         		// Exceptions thrown by those requests can be ignored.
@@ -140,7 +137,7 @@ public class WorkProvider {
 	                public void run() {
 	                    try {
                             connector.readPseudonym(identifiers.read());
-                        } catch (ConnectorException e) {
+                        } catch (BenchmarkException e) {
                         	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
                         		// Work submitted shortly before the benchmark was terminated might still be processed.
                         		// Exceptions thrown by those requests can be ignored.
@@ -157,7 +154,7 @@ public class WorkProvider {
 	                public void run() {
 	                    try {
                             connector.updatePseudonym(identifiers.read());
-                        } catch (ConnectorException e) {
+                        } catch (BenchmarkException e) {
                         	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
                         		// Work submitted shortly before the benchmark was terminated might still be processed.
                         		// Exceptions thrown by those requests can be ignored.
@@ -174,7 +171,7 @@ public class WorkProvider {
 	                public void run() {
 	                    try {
                             connector.deletePseudonym(identifiers.read());
-                        } catch (ConnectorException e) {
+                        } catch (BenchmarkException e) {
                         	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
                         		// Work submitted shortly before the benchmark was terminated might still be processed.
                         		// Exceptions thrown by those requests can be ignored.
@@ -191,7 +188,7 @@ public class WorkProvider {
 	                public void run() {
 	                    try {
                             connector.ping();
-                        } catch (ConnectorException e) {
+                        } catch (BenchmarkException e) {
                         	if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
                         		// Work submitted shortly before the benchmark was terminated might still be processed.
                         		// Exceptions thrown by those requests can be ignored.
