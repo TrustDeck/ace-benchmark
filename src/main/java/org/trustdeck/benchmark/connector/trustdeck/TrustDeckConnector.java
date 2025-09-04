@@ -119,7 +119,7 @@ public class TrustDeckConnector implements Connector {
                     // Ignore 404 errors
                     return;
                 }
-                log.info("\nPing failed :{}",e.getResponseStatusCode().value());
+                log.info("\nPing failed with error status code :{}",e.getResponseStatusCode());
             } catch (Exception e) {
                 throw new BenchmarkException(e);
             }
@@ -212,7 +212,7 @@ public class TrustDeckConnector implements Connector {
                 // Ignore 404 errors
                 return;
             }
-            log.info("\nPseudonym creation failed {}", e.getResponseStatusCode().value());
+            log.info("\nPseudonym creation failed with error {}", e.getResponseStatusCode());
 
         } catch (Exception e) {
             throw new BenchmarkException(e);
@@ -238,7 +238,7 @@ public class TrustDeckConnector implements Connector {
                 // Ignore 404 errors
                 return;
             }
-            log.info("\nPseudonym retrieval for id:{} failed :{}", id, e.getResponseStatusCode().value());
+            log.info("\nPseudonym retrieval for id:{} failed with error {}",id, e.getResponseStatusCode());
 
         } catch (Exception e) {
             throw new BenchmarkException(e);
@@ -263,7 +263,7 @@ public class TrustDeckConnector implements Connector {
                 //ignore
                 return;
             }
-            log.info("\nPseudonym update for id:{} failed :{}", id, e.getResponseStatusCode().value());
+            log.info("\nPseudonym update for id:{} failed with error {}",id, e.getResponseStatusCode());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -284,7 +284,7 @@ public class TrustDeckConnector implements Connector {
                 //ignore
                 return;
             }
-            log.info("\nPseudonym deletion for id:{} failed :{}", id, e.getResponseStatusCode().value());
+            log.info("\nPseudonym deletion for id:{} failed with error {}",id, e.getResponseStatusCode());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
