@@ -63,7 +63,7 @@ public class TrustDeckConnectorFactory implements ConnectorFactory {
             TrustDeckClient trustDeckClient = new TrustDeckClient(trustDeckClientConfig);
             log.debug(" Creation of TrustDeck client instance successful");
 
-            // 4. Crate TrustDeck Domain object to use for the benchmarking in ACE.
+            // 4. Create TrustDeck Domain object to use for the benchmarking in ACE.
             String serviceDomainName = toolConfig.get("domainName");
 
             // 5. Create TrustDeck Connector instance

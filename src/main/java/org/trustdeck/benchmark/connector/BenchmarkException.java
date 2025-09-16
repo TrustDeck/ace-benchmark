@@ -21,7 +21,7 @@ package org.trustdeck.benchmark.connector;
  *
  * @author Fabian Prasser
  */
-public class BenchmarkException extends Exception {
+public class BenchmarkException extends RuntimeException {
 
     /** SVUID */
     private static final long serialVersionUID = -3894908680128888153L;

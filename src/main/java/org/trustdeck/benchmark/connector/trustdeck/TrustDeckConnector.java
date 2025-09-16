@@ -89,7 +89,7 @@ public class TrustDeckConnector implements Connector {
      * Remove old data.
      */
     public void prepare() throws BenchmarkException {
-        try {
+
             try {
                 this.clearTables();
                 Thread.sleep(15000);
@@ -97,11 +97,11 @@ public class TrustDeckConnector implements Connector {
                 this.deleteDomainRightsAndRoles(this.domain);
                 log.info("Domain rights and roles cleared successfully");
                 this.createDomain(this.domain);
-                log.info("Domain - {} was created successfully", domain.getName());
+                log.debug("Domain - {} was created successfully", domain.getName());
             } catch (TrustDeckClientLibraryException | InterruptedException e) {
                 // Ignore
             }
-        } catch (Exception e) {
+        catch (Exception e) {
             throw new BenchmarkException(e);
         }
     }
@@ -119,7 +119,7 @@ public class TrustDeckConnector implements Connector {
                     // Ignore 404 errors
                     return;
                 }
-                log.info("\nPing failed with error status code :{}",e.getResponseStatusCode());
+                log.debug("\nPing failed with error status code :{}",e.getResponseStatusCode());
             } catch (Exception e) {
                 throw new BenchmarkException(e);
             }
@@ -149,7 +149,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().get(domain.getName());
         } catch (TrustDeckClientLibraryException e) {
-            log.info("\nDomain read failed for domain:{}", domain.getName());
+            log.debug("\nDomain read failed for domain:{}", domain.getName());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -166,7 +166,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().update(domainName, domain);
         } catch (TrustDeckClientLibraryException e) {
-            log.info("\nDomain update failed for domain:{}", domainName);
+            log.debug("\nDomain update failed for domain:{}", domainName);
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -183,7 +183,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().delete(domain.getName(), true);
         } catch (TrustDeckClientLibraryException e) {
-            log.info("\nDomain deletion failed for domain:{}", domain.getName());
+            log.debug("\nDomain deletion failed for domain:{}", domain.getName());
         } catch (Exception e) {
             {
                 throw new BenchmarkException(e);
@@ -212,7 +212,7 @@ public class TrustDeckConnector implements Connector {
                 // Ignore 404 errors
                 return;
             }
-            log.info("\nPseudonym creation failed with error {}", e.getResponseStatusCode());
+            log.debug("\nPseudonym creation failed with error {}", e.getResponseStatusCode());
 
         } catch (Exception e) {
             throw new BenchmarkException(e);
@@ -238,7 +238,7 @@ public class TrustDeckConnector implements Connector {
                 // Ignore 404 errors
                 return;
             }
-            log.info("\nPseudonym retrieval for id:{} failed with error {}",id, e.getResponseStatusCode());
+            log.debug("\nPseudonym retrieval for id:{} failed with error {}",id, e.getResponseStatusCode());
 
         } catch (Exception e) {
             throw new BenchmarkException(e);
@@ -263,7 +263,7 @@ public class TrustDeckConnector implements Connector {
                 //ignore
                 return;
             }
-            log.info("\nPseudonym update for id:{} failed with error {}",id, e.getResponseStatusCode());
+            log.debug("\nPseudonym update for id:{} failed with error {}",id, e.getResponseStatusCode());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -284,7 +284,7 @@ public class TrustDeckConnector implements Connector {
                 //ignore
                 return;
             }
-            log.info("\nPseudonym deletion for id:{} failed with error {}",id, e.getResponseStatusCode());
+            log.debug("\nPseudonym deletion for id:{} failed with error {}",id, e.getResponseStatusCode());
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
