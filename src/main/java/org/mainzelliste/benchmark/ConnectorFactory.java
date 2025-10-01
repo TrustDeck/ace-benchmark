@@ -14,12 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mainzelliste.benchmark;
+
+import org.trustdeck.benchmark.connector.BenchmarkException;
+
+/**
+ * A factory for connectors.
+ * 
+ * @author Fabian Prasser
+ */
+public interface ConnectorFactory {
+
+    /** Create a connector. */
+    public Connector create() throws BenchmarkException;
 
 
-public class MainzestilleConnector {
-
-    public static void main(String[] args) {
-        System.out.println("Setup successfull !");
-    }
 }
 

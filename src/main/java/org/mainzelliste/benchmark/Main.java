@@ -15,24 +15,19 @@
  * limitations under the License.
  */
 
-package org.trustdeck.benchmark;
+package org.mainzelliste.benchmark;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import org.trustdeck.benchmark.connector.BenchmarkException;
+import org.trustdeck.benchmark.connector.trustdeck.TrustDeckConnectorFactory;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.*;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.yaml.snakeyaml.Yaml;
-
-import org.trustdeck.benchmark.connector.BenchmarkException;
-import org.trustdeck.benchmark.connector.trustdeck.TrustDeckConnectorFactory;
-import org.mainzelliste.benchmark.ConnectorFactory;
 
 
 /**

@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-package org.trustdeck.benchmark;
+package org.mainzelliste.benchmark;
 
-import org.mainzelliste.benchmark.Connector;
 import org.trustdeck.benchmark.connector.BenchmarkException;
-import org.mainzelliste.benchmark.ConnectorFactory;
 
 /**
  * Class that provides the work for the worker threads.

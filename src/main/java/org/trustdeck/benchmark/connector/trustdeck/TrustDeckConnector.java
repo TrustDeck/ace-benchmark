@@ -18,9 +18,8 @@ package org.trustdeck.benchmark.connector.trustdeck;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
 import org.trustdeck.benchmark.connector.BenchmarkException;
-import org.trustdeck.benchmark.connector.Connector;
+import org.mainzelliste.benchmark.Connector;
 import org.trustdeck.client.TrustDeckClient;
 import org.trustdeck.client.exception.TrustDeckClientLibraryException;
 import org.trustdeck.client.exception.TrustDeckResponseException;

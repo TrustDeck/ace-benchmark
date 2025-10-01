@@ -14,18 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trustdeck.benchmark.connector;
-
-/**
- * A factory for connectors.
- * 
- * @author Fabian Prasser
- */
-public interface ConnectorFactory {
-
-    /** Create a connector. */
-    public Connector create() throws BenchmarkException;
 
 
+public class MainzestilleTestDeleteLater {
+
+    public static void main(String[] args) {
+        System.out.println("Setup successfull !");
+    }
 }
 

@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trustdeck.benchmark.connector;
+package org.mainzelliste.benchmark;
 
+import org.trustdeck.benchmark.connector.BenchmarkException;
 import org.trustdeck.client.model.Domain;
 
 /**
