@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.trustdeck.benchmark;
+package org.benchmark;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Getter;
 
-import org.trustdeck.benchmark.connector.BenchmarkException;
+import org.benchmark.connector.BenchmarkException;
 
 /**
  * This class contains the statistics collected for benchmarking.

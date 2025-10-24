@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mainzelliste.benchmark;
+package org.benchmark;
 
 import java.util.Random;
 

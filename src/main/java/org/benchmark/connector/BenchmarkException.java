@@ -14,20 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mainzelliste.benchmark;
-
-import org.trustdeck.benchmark.connector.BenchmarkException;
+package org.benchmark.connector;
 
 /**
- * A factory for connectors.
- * 
+ * This class handles exceptions thrown by the Benchmark app.
+ *
  * @author Fabian Prasser
  */
-public interface ConnectorFactory {
+public class BenchmarkException extends RuntimeException {
 
-    /** Create a connector. */
-    public Connector create() throws BenchmarkException;
+    /** SVUID */
+    private static final long serialVersionUID = -3894908680128888153L;
 
+    /**
+     * Constructor with cause
+     *
+     * @param e the cause of this exception
+     */
+    public BenchmarkException(Exception e) {
+        super(e);
+    }
 
+    /**
+     * Constructor with message and cause
+     *
+     * @param message the error message
+     * @param e the cause of this exception
+     */
+    public BenchmarkException(String message, Exception e) {
+        super(message, e);
+    }
 }
-

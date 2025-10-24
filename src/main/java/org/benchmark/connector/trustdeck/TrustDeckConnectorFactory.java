@@ -14,22 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trustdeck.benchmark.connector.trustdeck;
+package org.benchmark.connector.trustdeck;
 
 import java.io.InputStream;
 import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 import lombok.extern.slf4j.Slf4j;
 
-import org.trustdeck.benchmark.Main;
-import org.trustdeck.benchmark.connector.BenchmarkException;
+import org.benchmark.Main;
+import org.benchmark.connector.BenchmarkException;
 import org.mainzelliste.benchmark.ConnectorFactory;
 
 import org.trustdeck.client.TrustDeckClient;
 import org.trustdeck.client.config.TrustDeckClientConfig;
 
 /**
- * ACE connector factory.
+ * ACE mainzelliste factory.
  *
  * @author Fabian Prasser, Armin Müller, Chethan Nagaraj
  */
@@ -38,9 +38,9 @@ public class TrustDeckConnectorFactory implements ConnectorFactory {
 
 
     /**
-     * Creates a new connector.
+     * Creates a new mainzelliste.
      *
-     * @return the initialized connector
+     * @return the initialized mainzelliste
      * @throws BenchmarkException
      */
 
@@ -54,9 +54,17 @@ public class TrustDeckConnectorFactory implements ConnectorFactory {
             Map<String, Object> yamlConfig = yaml.load(inputStream);
             @SuppressWarnings("unchecked") Map<String, String> toolConfig = (Map<String, String>) yamlConfig.get("trustdeck");
 
-
+   
             // 2. Create TrustDeck Config object
-            TrustDeckClientConfig trustDeckClientConfig = TrustDeckClientConfig.builder().serviceUrl(toolConfig.get("trustdeck_service_url")).keycloakUrl(toolConfig.get("keycloak_service_url")).realm(toolConfig.get("keycloak_realm")).clientId(toolConfig.get("client_id")).clientSecret(toolConfig.get("client_secret")).userName(toolConfig.get("user_name")).password(toolConfig.get("user_password")).build();
+            TrustDeckClientConfig trustDeckClientConfig = TrustDeckClientConfig.builder()
+                    .serviceUrl(toolConfig.get("uri"))
+                    .keycloakUrl(toolConfig.get("keycloakAuthUri"))
+                    .realm(toolConfig.get("keycloakRealmName"))
+                    .clientId(toolConfig.get("clientId"))
+                    .clientSecret(toolConfig.get("clientSecret"))
+                    .userName(toolConfig.get("username"))
+                    .password(toolConfig.get("password"))
+                    .build();
             log.debug(" Creation of configuration object successful");
 
             // 3. Create TrustDeck client instance which internally initialises TrustDeck token service, domain service, pseudonym service, and util service

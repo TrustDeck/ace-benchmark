@@ -2,9 +2,9 @@
 //
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
-//import org.trustdeck.benchmark.connector.BenchmarkException;
-//import org.trustdeck.benchmark.connector.trustdeck.TrustDeckConnector;
-//import org.trustdeck.benchmark.connector.trustdeck.TrustDeckConnectorFactory;
+//import mainzelliste.org.benchmark.BenchmarkException;
+//import trustdeck.mainzelliste.org.benchmark.TrustDeckConnector;
+//import trustdeck.mainzelliste.org.benchmark.TrustDeckConnectorFactory;
 //import org.trustdeck.client.TrustDeckClient;
 //import org.trustdeck.client.exception.TrustDeckClientLibraryException;
 //import org.trustdeck.client.exception.TrustDeckResponseException;
@@ -17,20 +17,20 @@
 //
 //    private TrustDeckClient trustDeckClient;
 //    private Domain domain;
-//    private TrustDeckConnector connector;
+//    private TrustDeckConnector mainzelliste;
 //
 //    @BeforeEach
 //    void setUp() throws BenchmarkException {
 //        TrustDeckConnectorFactory factory = new TrustDeckConnectorFactory();
-//        this.connector = factory.create();
-//        this.trustDeckClient = connector.getTrustDeckClient();
+//        this.mainzelliste = factory.create();
+//        this.trustDeckClient = mainzelliste.getTrustDeckClient();
 //        this.domain = Domain.builder().name("Project-Alpha3").prefix("PA-").build();
 //    }
 //
 //    @Test
 //    void testPing() {
 //        assertDoesNotThrow(() -> {
-//            connector.ping();
+//            mainzelliste.ping();
 //        });
 //    }
 //

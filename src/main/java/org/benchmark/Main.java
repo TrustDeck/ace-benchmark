@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.trustdeck.benchmark;
+package org.benchmark;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 
-import org.trustdeck.benchmark.connector.BenchmarkException;
-import org.trustdeck.benchmark.connector.trustdeck.TrustDeckConnectorFactory;
+import org.benchmark.connector.BenchmarkException;
+import org.benchmark.connector.trustdeck.TrustDeckConnectorFactory;
 import org.mainzelliste.benchmark.ConnectorFactory;
 
 

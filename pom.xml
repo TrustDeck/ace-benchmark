@@ -37,7 +37,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.trustdeck.benchmark.Main</mainClass>
+									<mainClass>org.benchmark.Main</mainClass>
 									<manifestEntries>
                                         <Multi-Release>true</Multi-Release>
                                     </manifestEntries>
@@ -158,9 +158,13 @@
 		<dependency>
 			<groupId>de.pseudonymisierung</groupId>
 			<artifactId>mainzelliste-client</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.3</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.codehaus.jettison</groupId>
+			<artifactId>jettison</artifactId>
+			<version>1.5.4</version>
+		</dependency>
 
 	</dependencies>
 	

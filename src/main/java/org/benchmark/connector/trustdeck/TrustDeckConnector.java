@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.trustdeck.benchmark.connector.trustdeck;
+package org.benchmark.connector.trustdeck;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.trustdeck.benchmark.connector.BenchmarkException;
+import org.benchmark.connector.BenchmarkException;
 import org.mainzelliste.benchmark.Connector;
 import org.trustdeck.client.TrustDeckClient;
 import org.trustdeck.client.exception.TrustDeckClientLibraryException;
@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
  * Connector to ACE.
  *
  * @author Fabian Prasser, Armin Müller, Chethan Nagaraj
+ * TODO Check if mainzelliste is reused, check if resttemplate should be shutdown, check if need to creadte DOmain , Psueodnonym models here
  */
 @Slf4j
 public class TrustDeckConnector implements Connector {
@@ -71,7 +72,7 @@ public class TrustDeckConnector implements Connector {
 
 
     /**
-     * Create a new instance of the connector.
+     * Create a new instance of the mainzelliste.
      */
     public TrustDeckConnector(TrustDeckClient trustDeckClient, String serviceDomainName) {
 

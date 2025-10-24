@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.trustdeck.benchmark;
+package org.benchmark;
 
 /**
  * This class represents a thread that performs dedicated work.

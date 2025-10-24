@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.trustdeck.benchmark;
+package org.benchmark;
 
 import org.mainzelliste.benchmark.Connector;
-import org.trustdeck.benchmark.connector.BenchmarkException;
+import org.benchmark.connector.BenchmarkException;
 import org.mainzelliste.benchmark.ConnectorFactory;
 
 /**
@@ -35,7 +35,7 @@ public class WorkProvider {
     private WorkDistribution distribution;
     
     /** The set of identifiers used to create/access pseudonym-objects. */
-    private Identifiers identifiers;
+    private Identifiers identifiers; 
     
     /** The statistics object. */
     private Statistics statistics;
@@ -109,7 +109,7 @@ public class WorkProvider {
      */
     public Runnable getWork() {
         
-        // Obtain thread-local connector
+        // Obtain thread-local mainzelliste
         Connector connector = threadLocalConnectors.get();
         
         // Get the template according to the defined distribution

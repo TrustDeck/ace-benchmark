@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.trustdeck.benchmark;
+package org.benchmark;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
