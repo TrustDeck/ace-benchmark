@@ -56,12 +56,10 @@ public class TrustDeckConnectorFactory implements ConnectorFactory {
 
 
             // 2. Create TrustDeck Config object
-            TrustDeckClientConfig trustDeckClientConfig = TrustDeckClientConfig.builder().serviceUrl(toolConfig.get("trustdeck_service_url")).keycloakUrl(toolConfig.get("keycloak_service_url")).realm(toolConfig.get("keycloak_realm")).clientId(toolConfig.get("client_id")).clientSecret(toolConfig.get("client_secret")).userName(toolConfig.get("user_name")).password(toolConfig.get("user_password")).build();
-            log.debug(" Creation of configuration object successful");
+            TrustDeckClientConfig trustDeckClientConfig = TrustDeckClientConfig.builder().serviceUrl(toolConfig.get("uri")).keycloakUrl(toolConfig.get("keycloakAuthUri")).realm(toolConfig.get("keycloakRealmName")).clientId(toolConfig.get("clientId")).clientSecret(toolConfig.get("clientSecret")).userName(toolConfig.get("username")).password(toolConfig.get("password")).build();
 
             // 3. Create TrustDeck client instance which internally initialises TrustDeck token service, domain service, pseudonym service, and util service
             TrustDeckClient trustDeckClient = new TrustDeckClient(trustDeckClientConfig);
-            log.debug(" Creation of TrustDeck client instance successful");
 
             // 4. Create TrustDeck Domain object to use for the benchmarking in ACE.
             String serviceDomainName = toolConfig.get("domainName");
@@ -77,15 +75,4 @@ public class TrustDeckConnectorFactory implements ConnectorFactory {
 
     }
 
-
-//Not neccessary as RestTemplate does not require explicit shutdown
-
-
-    /*
-     * Not necessary as RestTemplate does not require explicit shutdown.
-     * @Override
-     * public void shutdown() {
-     * HTTPClientManager.shutdown();
-    }
-     */
 }

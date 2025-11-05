@@ -18,7 +18,6 @@ package org.trustdeck.benchmark.connector.trustdeck;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
 import org.trustdeck.benchmark.connector.BenchmarkException;
 import org.trustdeck.benchmark.connector.Connector;
 import org.trustdeck.client.TrustDeckClient;
@@ -90,18 +89,14 @@ public class TrustDeckConnector implements Connector {
      */
     public void prepare() throws BenchmarkException {
 
-            try {
-                this.clearTables();
-                Thread.sleep(15000);
-                log.info("Tables cleared successfully");
-                this.deleteDomainRightsAndRoles(this.domain);
-                log.info("Domain rights and roles cleared successfully");
-                this.createDomain(this.domain);
-                log.debug("Domain - {} was created successfully", domain.getName());
-            } catch (TrustDeckClientLibraryException | InterruptedException e) {
-                // Ignore
-            }
-        catch (Exception e) {
+        try {
+
+            this.clearTables();
+            Thread.sleep(15000);
+            log.info("pseudonym size after - {}",this.getStorageConsumption("pseudonym"));
+            this.deleteDomainRightsAndRoles(this.domain);
+            this.createDomain(this.domain);
+        } catch (Exception e) {
             throw new BenchmarkException(e);
         }
     }
@@ -112,20 +107,19 @@ public class TrustDeckConnector implements Connector {
     @Override
     public void ping() throws BenchmarkException {
         try {
-            this.trustDeckClient.ping();
-            log.debug("\nPing successful");
+            Boolean response = this.trustDeckClient.ping();
+
         } catch (TrustDeckClientLibraryException e) {
-                if (e.getResponseStatusCode().value() == 404) {
-                    // Ignore 404 errors
-                    return;
-                }
-                log.debug("\nPing failed with error status code :{}",e.getResponseStatusCode());
-            } catch (Exception e) {
-                throw new BenchmarkException(e);
+            if (e.getResponseStatusCode() != null && e.getResponseStatusCode().value() == 404) {
+//                // Ignore 404 errors
+//                return;
+//
+                log.info("Response {},status code {}", e, e.getResponseStatusCode());
+                throw new BenchmarkException(e);  // Throw non-404 errors
             }
         }
 
-
+    }
 //------------------------------------- Domain Operations---------------------------------------------------------------------------------------
 
     /**
@@ -149,7 +143,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().get(domain.getName());
         } catch (TrustDeckClientLibraryException e) {
-            log.debug("\nDomain read failed for domain:{}", domain.getName());
+            //ignore
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -166,7 +160,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().update(domainName, domain);
         } catch (TrustDeckClientLibraryException e) {
-            log.debug("\nDomain update failed for domain:{}", domainName);
+            //ignore
         } catch (Exception e) {
             throw new BenchmarkException(e);
         }
@@ -183,7 +177,7 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.domains().delete(domain.getName(), true);
         } catch (TrustDeckClientLibraryException e) {
-            log.debug("\nDomain deletion failed for domain:{}", domain.getName());
+            //ignore
         } catch (Exception e) {
             {
                 throw new BenchmarkException(e);
@@ -209,13 +203,10 @@ public class TrustDeckConnector implements Connector {
             this.trustDeckClient.pseudonyms(this.domain.getName()).create(identifierItem, false);
         } catch (TrustDeckClientLibraryException e) {
             if (e.getResponseStatusCode().value() == 404) {
-                // Ignore 404 errors
+                //ignore
                 return;
             }
-            log.debug("\nPseudonym creation failed with error {}", e.getResponseStatusCode());
-
-        } catch (Exception e) {
-            throw new BenchmarkException(e);
+            throw new BenchmarkException(e);  // Throw non-404 errors
         }
     }
 
@@ -235,13 +226,10 @@ public class TrustDeckConnector implements Connector {
             this.trustDeckClient.pseudonyms(this.domain.getName()).get(identifierItem);
         } catch (TrustDeckClientLibraryException e) {
             if (e.getResponseStatusCode().value() == 404) {
-                // Ignore 404 errors
                 return;
+                // Silent 404 like ACE connector
             }
-            log.debug("\nPseudonym retrieval for id:{} failed with error {}",id, e.getResponseStatusCode());
-
-        } catch (Exception e) {
-            throw new BenchmarkException(e);
+            throw new BenchmarkException(e);  // Throw non-404 errors
         }
     }
 
@@ -257,15 +245,12 @@ public class TrustDeckConnector implements Connector {
             IdentifierItem identifierItem = IdentifierItem.builder().identifier(id).idType(DEFAULT_ID_TYPE).build();
             Pseudonym updatePseudonym = Pseudonym.builder().identifierItem(identifierItem).validFrom(DEFAULT_PSEUDONYM_VALID_FROM).build();
             this.trustDeckClient.pseudonyms(this.domain.getName()).update(identifierItem, updatePseudonym);
-            log.debug(" Pseudonym Update successful for identifier :{} ", id);
         } catch (TrustDeckClientLibraryException e) {
             if (e.getResponseStatusCode().value() == 404) {
                 //ignore
                 return;
             }
-            log.debug("\nPseudonym update for id:{} failed with error {}",id, e.getResponseStatusCode());
-        } catch (Exception e) {
-            throw new BenchmarkException(e);
+            throw new BenchmarkException(e);  // Throw non-404 errors
         }
     }
 
@@ -284,9 +269,7 @@ public class TrustDeckConnector implements Connector {
                 //ignore
                 return;
             }
-            log.debug("\nPseudonym deletion for id:{} failed with error {}",id, e.getResponseStatusCode());
-        } catch (Exception e) {
-            throw new BenchmarkException(e);
+            throw new BenchmarkException(e);  // Throw non-404 errors
         }
     }
 
@@ -311,7 +294,11 @@ public class TrustDeckConnector implements Connector {
      */
     @Override
     public void deleteDomainRightsAndRoles(Domain domain) throws TrustDeckClientLibraryException {
-        this.trustDeckClient.dbMaintenance().deleteDomainRightsAndRoles(domain);
+        try {
+            this.trustDeckClient.dbMaintenance().deleteDomainRightsAndRoles(domain);
+        } catch(Exception e){
+            throw new BenchmarkException(e);
+        }
     }
 
     /**
