@@ -83,7 +83,7 @@ public class ACETokenManager {
         InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("config.yaml");
         Map<String, Object> yamlConfig = yaml.load(inputStream);
         @SuppressWarnings("unchecked")
-        Map<String, String> toolConfig = (Map<String, String>) yamlConfig.get("ace");
+        Map<String, String> toolConfig = (Map<String, String>) yamlConfig.get("trustdeck");
         
         // Create the Keycloak instance
         this.keycloakInstance = Keycloak.getInstance(
