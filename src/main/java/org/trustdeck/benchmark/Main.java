@@ -95,6 +95,11 @@ public class Main {
         // Some logging
         System.out.println("\n++++++++++++++++++++++++++++ ACE Benchmark ++++++++++++++++++++++++++++\n");
 
+        // Authenticate
+        System.out.print("\r - Preparing benchmark: initialize authentication                      ");
+        ACETokenManager.getInstance().initialize();
+        System.out.println("\r - Preparing benchmark: initialize authentication\t\t[DONE]");
+
         // Execute
         ConnectorFactory factory = new ACEConnectorFactory();
         for (Configuration config : configs) {
@@ -129,10 +134,6 @@ public class Main {
         WorkProvider provider = new WorkProvider(config, identifiers, statistics, factory);
         System.out.println("\r - Preparing benchmark: creating work provider\t\t\t[DONE]");
 
-        // Authenticate
-        System.out.print("\r - Preparing benchmark: initialize authentication                      ");
-        ACETokenManager.getInstance().initialize();
-        System.out.println("\r - Preparing benchmark: initialize authentication\t\t[DONE]");
 
         // Prepare
         System.out.print("\r - Preparing benchmark: purge database and re-initialize        ");
@@ -156,12 +157,8 @@ public class Main {
         System.out.println("   - Number of workers launched: " + config.getNumThreads());
 
         // Files to write to
-        BufferedWriter writer = new BufferedWriter(new FileWriter(
-                new File(config.getName() + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv")));
-        BufferedWriter dbWriter = config.isReportDBSpace()
-                ? new BufferedWriter(new FileWriter(
-                new File(config.getName() + "_DB_STORAGE-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv")))
-                : null;
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(config.getName() + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv")));
+        BufferedWriter dbWriter = config.isReportDBSpace() ? new BufferedWriter(new FileWriter(new File(config.getName() + "_DB_STORAGE-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv"))) : null;
 
         try {
             // Event and logging loop
