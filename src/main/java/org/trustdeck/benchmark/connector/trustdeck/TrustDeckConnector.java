@@ -93,7 +93,7 @@ public class TrustDeckConnector implements Connector {
 
             this.clearTables();
             Thread.sleep(15000);
-            log.info("pseudonym size after - {}",this.getStorageConsumption("pseudonym"));
+            log.info("pseudonym size after - {}", this.getStorageConsumption("pseudonym"));
             this.deleteDomainRightsAndRoles(this.domain);
             this.createDomain(this.domain);
         } catch (Exception e) {
@@ -114,7 +114,6 @@ public class TrustDeckConnector implements Connector {
 //                // Ignore 404 errors
 //                return;
 //
-                log.info("Response {},status code {}", e, e.getResponseStatusCode());
                 throw new BenchmarkException(e);  // Throw non-404 errors
             }
         }
@@ -296,7 +295,7 @@ public class TrustDeckConnector implements Connector {
     public void deleteDomainRightsAndRoles(Domain domain) throws TrustDeckClientLibraryException {
         try {
             this.trustDeckClient.dbMaintenance().deleteDomainRightsAndRoles(domain);
-        } catch(Exception e){
+        } catch (Exception e) {
             throw new BenchmarkException(e);
         }
     }

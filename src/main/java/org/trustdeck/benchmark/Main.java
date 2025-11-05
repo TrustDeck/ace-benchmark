@@ -134,7 +134,7 @@ public class Main {
         System.out.println("\r - Preparing benchmark: Done");
         System.out.println("\n - Executing configuration: " + config.getName());
 
-        // Start workers and keep references (updated)
+        // Start workers and keep references
         statistics.start();
         List<Thread> workers = new ArrayList<>();
         for (int i = 0; i < config.getNumThreads(); i++) {
@@ -200,19 +200,20 @@ public class Main {
             for (Thread t : workers) t.interrupt();
             for (Thread t : workers) {
                 try {
-                    t.join(5000);
-                } catch (InterruptedException ignored) {
+                    t.join(5000); // waits 5 secs for each worker thread to stop
+                } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
             // Always close writers here
             try {
-                if (writer != null) writer.close();
-            } catch (IOException ignored) { /* ignore */ }
+                writer.close();
+            } catch (IOException e) { /* ignore */ }
+
             if (dbWriter != null) {
                 try {
                     dbWriter.close();
-                } catch (IOException ignored) { /* ignore */ }
+                } catch (IOException e) { /* ignore */ }
             }
             System.out.println(" - Done\n");
         }
