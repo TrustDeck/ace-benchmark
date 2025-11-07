@@ -22,3 +22,13 @@ pseudonymization services. We provide an example implementation for the pseudony
 ## Configuration
 
 - Example configuration files can be found in the resources directory.
+
+## How to cite
+
+If you use this software in your research, please cite the accompanying articles:
+
+Benchmark:
+> Müller A, Wirth FN, Prasser F. **An Open Source Benchmark for Pseudonymization Services in Translational Research.** *Stud Health Technol Inform.* 2025 Aug 7;329:219-223. doi: 10.3233/SHTI250833. PMID: 40775851.
+
+ACE:
+> Müller A, Wündisch E, Wirth FN, Meier Zu Ummeln S, Weber J, Prasser F. **The Advanced Confidentiality Engine as a Scalable Tool for the Pseudonymization of Biomedical Data in Translational Settings: Development and Usability Study.** *J Med Internet Res.* 2025 Nov 5;27:e71822. doi:10.2196/71822. PMID: 41191920.
