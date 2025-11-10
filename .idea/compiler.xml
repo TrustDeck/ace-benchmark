@@ -3,12 +3,9 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <module name="benchmark" />
-      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="benchmark" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

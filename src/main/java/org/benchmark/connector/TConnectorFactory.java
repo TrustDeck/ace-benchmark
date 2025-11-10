@@ -14,12 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.benchmark.connector;
+
+/**
+ * A factory for connectors.
+ * 
+ * @author Fabian Prasser
+ */
+public interface TConnectorFactory {
+
+    /**
+     * Create a connector.
+     */
+    public TConnector create() throws BenchmarkException;
 
 
-public class MainzestilleTestDeleteLater {
-
-    public static void main(String[] args) {
-        System.out.println("Setup successfull !");
-    }
 }
 

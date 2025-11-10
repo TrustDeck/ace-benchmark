@@ -202,85 +202,85 @@ public class Statistics {
         this.lastOverallTPS = (int) tpsOverall;
     }
     
-    /**
-    * Reporting DB storage. NOT thread safe.
-    *
-    * @throws IOException
-     * @throws BenchmarkException
-    */
-   public void reportDBStorage(Writer writer, WorkProvider provider) throws BenchmarkException, IOException {
-
-       // Collect data
-       long currentTime = System.currentTimeMillis();
-
-       String d = provider.getDBStorageMetrics("domain");
-       String p = provider.getDBStorageMetrics("pseudonym");
-       String a = provider.getDBStorageMetrics("auditevent");
-
-       // Derive parameters
-       long domainSize, domainRecordCount, domainDBSize, pseudonymSize, pseudonymRecordCount, pseudonymDBSize, auditeventSize, auditeventRecordCount, auditeventDBSize;
-       double domainBytesPerRecord, pseudonymBytesPerRecord, auditeventBytesPerRecord;
-
-           // Process domain metrics
-           domainSize = Long.parseLong(d.substring(d.indexOf("tableSize: ") + "tableSize: ".length(), d.indexOf(", recordCount:")).trim());
-           domainRecordCount = Long.parseLong(d.substring(d.indexOf("recordCount: ") + "recordCount: ".length(), d.indexOf(", totalSize:")).trim());
-           domainDBSize = Long.parseLong(d.substring(d.indexOf("totalSize: ") + "totalSize: ".length()).trim());
-           domainBytesPerRecord = (double) domainSize / (double) domainRecordCount;
-
-           // Process pseudonym metrics
-           pseudonymSize = Long.parseLong(p.substring(p.indexOf("tableSize: ") + "tableSize: ".length(), p.indexOf(", recordCount:")).trim());
-           pseudonymRecordCount = Long.parseLong(p.substring(p.indexOf("recordCount: ") + "recordCount: ".length(), p.indexOf(", totalSize:")).trim());
-           pseudonymDBSize = Long.parseLong(p.substring(p.indexOf("totalSize: ") + "totalSize: ".length()).trim());
-           pseudonymBytesPerRecord = (double) pseudonymSize / (double) pseudonymRecordCount;
-
-           // Process audit event metrics
-           auditeventSize = Long.parseLong(a.substring(a.indexOf("tableSize: ") + "tableSize: ".length(), a.indexOf(", recordCount:")).trim());
-           auditeventRecordCount = Long.parseLong(a.substring(a.indexOf("recordCount: ") + "recordCount: ".length(), a.indexOf(", totalSize:")).trim());
-           auditeventDBSize = Long.parseLong(a.substring(a.indexOf("totalSize: ") + "totalSize: ".length()).trim());
-           auditeventBytesPerRecord = (double) auditeventSize / (double) auditeventRecordCount;
-
-       // Print header
-       if (lastTimeDB == 0) {
-
-           // Print parameters
-           StringBuilder builder = new StringBuilder();
-           builder.append("Time").append(";");
-           builder.append("Table name").append(";");
-           builder.append("Table size").append(";");
-           builder.append("Number of records").append(";");
-           builder.append("Bytes per record").append(";");
-           builder.append("Database size").append("\n");
-           writer.write(builder.toString());
-       }
-
-       // Print parameters
-       StringBuilder builder = new StringBuilder();
-       builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
-       builder.append("domain").append(";");
-       builder.append(domainSize).append(";");
-       builder.append(domainRecordCount).append(";");
-       builder.append(domainBytesPerRecord).append(";");
-       builder.append(domainDBSize).append("\n");
-
-       builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
-       builder.append("pseudonym").append(";");
-       builder.append(pseudonymSize).append(";");
-       builder.append(pseudonymRecordCount).append(";");
-       builder.append(pseudonymBytesPerRecord).append(";");
-       builder.append(pseudonymDBSize).append("\n");
-
-       builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
-       builder.append("auditevent").append(";");
-       builder.append(auditeventSize).append(";");
-       builder.append(auditeventRecordCount).append(";");
-       builder.append(auditeventBytesPerRecord).append(";");
-       builder.append(auditeventDBSize).append("\n");
-
-       writer.write(builder.toString());
-
-       // Store
-       this.lastTimeDB = currentTime;
-   }
+//    /**
+//    * Reporting DB storage. NOT thread safe.
+//    *
+//    * @throws IOException
+//     * @throws BenchmarkException
+//    */
+//   public void reportDBStorage(Writer writer, WorkProvider provider) throws BenchmarkException, IOException {
+//
+//       // Collect data
+//       long currentTime = System.currentTimeMillis();
+//
+//       String d = provider.getDBStorageMetrics("domain");
+//       String p = provider.getDBStorageMetrics("pseudonym");
+//       String a = provider.getDBStorageMetrics("auditevent");
+//
+//       // Derive parameters
+//       long domainSize, domainRecordCount, domainDBSize, pseudonymSize, pseudonymRecordCount, pseudonymDBSize, auditeventSize, auditeventRecordCount, auditeventDBSize;
+//       double domainBytesPerRecord, pseudonymBytesPerRecord, auditeventBytesPerRecord;
+//
+//           // Process domain metrics
+//           domainSize = Long.parseLong(d.substring(d.indexOf("tableSize: ") + "tableSize: ".length(), d.indexOf(", recordCount:")).trim());
+//           domainRecordCount = Long.parseLong(d.substring(d.indexOf("recordCount: ") + "recordCount: ".length(), d.indexOf(", totalSize:")).trim());
+//           domainDBSize = Long.parseLong(d.substring(d.indexOf("totalSize: ") + "totalSize: ".length()).trim());
+//           domainBytesPerRecord = (double) domainSize / (double) domainRecordCount;
+//
+//           // Process pseudonym metrics
+//           pseudonymSize = Long.parseLong(p.substring(p.indexOf("tableSize: ") + "tableSize: ".length(), p.indexOf(", recordCount:")).trim());
+//           pseudonymRecordCount = Long.parseLong(p.substring(p.indexOf("recordCount: ") + "recordCount: ".length(), p.indexOf(", totalSize:")).trim());
+//           pseudonymDBSize = Long.parseLong(p.substring(p.indexOf("totalSize: ") + "totalSize: ".length()).trim());
+//           pseudonymBytesPerRecord = (double) pseudonymSize / (double) pseudonymRecordCount;
+//
+//           // Process audit event metrics
+//           auditeventSize = Long.parseLong(a.substring(a.indexOf("tableSize: ") + "tableSize: ".length(), a.indexOf(", recordCount:")).trim());
+//           auditeventRecordCount = Long.parseLong(a.substring(a.indexOf("recordCount: ") + "recordCount: ".length(), a.indexOf(", totalSize:")).trim());
+//           auditeventDBSize = Long.parseLong(a.substring(a.indexOf("totalSize: ") + "totalSize: ".length()).trim());
+//           auditeventBytesPerRecord = (double) auditeventSize / (double) auditeventRecordCount;
+//
+//       // Print header
+//       if (lastTimeDB == 0) {
+//
+//           // Print parameters
+//           StringBuilder builder = new StringBuilder();
+//           builder.append("Time").append(";");
+//           builder.append("Table name").append(";");
+//           builder.append("Table size").append(";");
+//           builder.append("Number of records").append(";");
+//           builder.append("Bytes per record").append(";");
+//           builder.append("Database size").append("\n");
+//           writer.write(builder.toString());
+//       }
+//
+//       // Print parameters
+//       StringBuilder builder = new StringBuilder();
+//       builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
+//       builder.append("domain").append(";");
+//       builder.append(domainSize).append(";");
+//       builder.append(domainRecordCount).append(";");
+//       builder.append(domainBytesPerRecord).append(";");
+//       builder.append(domainDBSize).append("\n");
+//
+//       builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
+//       builder.append("pseudonym").append(";");
+//       builder.append(pseudonymSize).append(";");
+//       builder.append(pseudonymRecordCount).append(";");
+//       builder.append(pseudonymBytesPerRecord).append(";");
+//       builder.append(pseudonymDBSize).append("\n");
+//
+//       builder.append(String.valueOf((double)(currentTime - startTime)/1000d).replace('.', ',')).append(";");
+//       builder.append("auditevent").append(";");
+//       builder.append(auditeventSize).append(";");
+//       builder.append(auditeventRecordCount).append(";");
+//       builder.append(auditeventBytesPerRecord).append(";");
+//       builder.append(auditeventDBSize).append("\n");
+//
+//       writer.write(builder.toString());
+//
+//       // Store
+//       this.lastTimeDB = currentTime;
+//   }
 
     /**
      * Stores the start time.

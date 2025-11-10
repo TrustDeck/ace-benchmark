@@ -3,7 +3,7 @@
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import mainzelliste.org.benchmark.BenchmarkException;
-//import trustdeck.mainzelliste.org.benchmark.TrustDeckConnector;
+//import trustdeck.mainzelliste.org.benchmark.TConnector;
 //import trustdeck.mainzelliste.org.benchmark.TrustDeckConnectorFactory;
 //import org.trustdeck.client.TrustDeckClient;
 //import org.trustdeck.client.exception.TrustDeckClientLibraryException;
@@ -17,7 +17,7 @@
 //
 //    private TrustDeckClient trustDeckClient;
 //    private Domain domain;
-//    private TrustDeckConnector mainzelliste;
+//    private TConnector mainzelliste;
 //
 //    @BeforeEach
 //    void setUp() throws BenchmarkException {

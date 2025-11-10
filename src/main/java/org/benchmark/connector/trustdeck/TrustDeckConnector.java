@@ -19,7 +19,7 @@ package org.benchmark.connector.trustdeck;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.benchmark.connector.BenchmarkException;
-import org.mainzelliste.benchmark.Connector;
+import org.benchmark.connector.TConnector;
 import org.trustdeck.client.TrustDeckClient;
 import org.trustdeck.client.exception.TrustDeckClientLibraryException;
 import org.trustdeck.client.exception.TrustDeckResponseException;
@@ -37,7 +37,7 @@ import java.time.LocalDateTime;
  * TODO Check if mainzelliste is reused, check if resttemplate should be shutdown, check if need to creadte DOmain , Psueodnonym models here
  */
 @Slf4j
-public class TrustDeckConnector implements Connector {
+public class TrustDeckConnector implements TConnector{
 
     /**
      * Default domain prefix.

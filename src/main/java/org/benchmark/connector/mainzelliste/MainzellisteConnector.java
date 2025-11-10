@@ -16,6 +16,10 @@
  */
 package org.benchmark.connector.mainzelliste;
 
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.benchmark.connector.BenchmarkException;
+import org.benchmark.connector.MConnector;
 import de.pseudonymisierung.mainzelliste.client.*;
 import de.pseudonymisierung.mainzelliste.client.MainzellisteConnection.RequestMethod;
 import lombok.Getter;
@@ -23,15 +27,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.trustdeck.client.exception.TrustDeckClientLibraryException;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 @Getter
 @Slf4j
-public class MainzellisteConnector {
+public class MainzellisteConnector implements MConnector {
 
 
     private final MainzellisteConnection connection;
@@ -48,42 +54,61 @@ public class MainzellisteConnector {
         this.validator = validator;
     }
 
+    public void prepare() throws BenchmarkException {
 
-    public JSONObject addPatient(String idType, Map<String,String> body) throws InvalidSessionException, MainzellisteNetworkException, JSONException {
-
-        // Prepare AddPatientToken Object
-        AddPatientToken addPatToken = new AddPatientToken();
-
-        // add new Patient data to the token
-        List<String> additionFields = Arrays.asList("vorname", "nachname", "geburtstag", "geburtsmonat", "geburtsjahr");
-        for(String field:additionFields){
-            addPatToken.addField(field,body.get(field));
+        try {
+//            this.clearTables();
+            Thread.sleep(15000);
+            log.info("Tables cleared successfully");
+        } catch (TrustDeckClientLibraryException | InterruptedException e) {
+            // Ignore
+        } catch (Exception e) {
+            throw new BenchmarkException(e);
         }
-
-        // convert token to JSON object.
-        JSONObject addPatTokenJSON = addPatToken.toJSON();
-
-
-        //Create and fetch the token from the server.
-        String addPatTokenId = session.getToken(addPatToken);
-        log.debug("AddPatientToken ID received: {}", addPatTokenId);
-
-        // Using Client library, send API request to create Patient using token id and token Json object.
-        MainzellisteResponse addPatientResponse = connection.doRequest(RequestMethod.POST, "patients?tokenId=" + addPatTokenId, String.valueOf(addPatTokenJSON));
-        log.debug("Created Patient details -{} ", addPatientResponse.getData());
-
-        JSONArray responseArray = new JSONArray(addPatientResponse.getData());
-        JSONObject responseObject = responseArray.getJSONObject(0);
-
-        log.debug("Created Patient with IdString-{} ", responseObject);
-
-
-        return responseObject;
-
     }
+    public JSONObject addPatient(String idType, String idString)  {
+        // Prepare AddPatientToken Object
+        try {
+            AddPatientToken addPatToken = new AddPatientToken();
+            addPatToken.addExternalId(idType, idString);
+            // Add sureness parameter to force creation even with possible matches
+            Map<String, String> newPatientFields = new HashMap<>();
+            newPatientFields.put("vorname", RandomStringUtils.randomAlphabetic(5));
+            newPatientFields.put("nachname",RandomStringUtils.randomAlphabetic(5));
+            newPatientFields.put("geburtstag", "02");
+            newPatientFields.put("geburtsmonat", "03");
+            newPatientFields.put("geburtsjahr", "1990");
 
+            for(Map.Entry<String,String> entry : newPatientFields.entrySet()){
+                addPatToken.addField(entry.getKey(), entry.getValue());
+            }
+            // Convert token to JSON object
+            JSONObject addPatTokenJSON = addPatToken.toJSON();
+
+            addPatTokenJSON.put("sureness",true);
+
+            // Create and fetch the token from the server
+            String addPatTokenId = session.getToken(addPatToken);
+            log.info("AddPatientToken ID received: {}", addPatTokenId);
+
+            // Send API request to create Patient
+
+            MainzellisteResponse addPatientResponse = connection.doRequest(
+                    RequestMethod.POST,
+                    "patients?tokenId=" + addPatTokenId,
+                    String.valueOf(addPatTokenJSON)
+            );
+            log.info("add patient response :{}", addPatientResponse.getData());
+
+            // Get the first object from the array response
+            JSONArray responseArray = new JSONArray(addPatientResponse.getData());
+            return responseArray.getJSONObject(0);
+        }catch(Exception e){
+            return null;
+        }
+    }
     public String readPatient(ID patientId) throws InvalidSessionException, MainzellisteNetworkException {
-        ReadPatientsToken readPatientsToken = new ReadPatientsToken();
+       try{ ReadPatientsToken readPatientsToken = new ReadPatientsToken();
         readPatientsToken.addSearchId(patientId);
 
         // Add the fields you want to retrieve
@@ -96,17 +121,24 @@ public class MainzellisteConnector {
         // Make the GET request
         MainzellisteResponse readPatientResponse = connection.doRequest(RequestMethod.GET, "patients?tokenId=" + readPatientstokenId, null);
 
-        log.debug("Read patient response: {}", readPatientResponse.getData());
+        log.info("Read patient response: {}", readPatientResponse.getData());
         return readPatientResponse.getData();
+    }catch(Exception e){
+        return null;
     }
+}
 
-    public String editPatient(ID id, JSONObject updateBody) throws Exception {
 
+    public String editPatient(ID id) throws InvalidSessionException, MainzellisteNetworkException, JSONException {
+try{
         // Create edit token
         EditPatientToken editPatientToken = new EditPatientToken(id);
         log.debug("id debug-{}", id.getIdString());
         List<String> fieldsToEdit = List.of("ort");
         editPatientToken.setFieldsToEdit(fieldsToEdit);
+        //  Create Patient data to call editPatient method
+        JSONObject updateBody = new JSONObject();
+        updateBody.put("ort", "newOrt");
 
         // Get token
         String editPatientTokenId = session.getToken(editPatientToken);
@@ -117,14 +149,16 @@ public class MainzellisteConnector {
 
         log.debug("Edit Patient response: {}", editPatientResponse.getStatusCode());
         return String.valueOf(editPatientResponse.getStatusCode());
+    }catch(Exception e){
+        return null;
+        }
+        }
 
 
-    }
 
-    public String deletePatient(ID id) throws MainzellisteNetworkException, InvalidSessionException {
+    public String deletePatient(ID id) throws InvalidSessionException, MainzellisteNetworkException {
 
-
-
+try{
         // create deletePatient token
         DeletePatientToken deletePatienttoken = new DeletePatientToken(id);
 
@@ -143,5 +177,19 @@ public class MainzellisteConnector {
 
 
         return String.valueOf(deletePatientResponse.getStatusCode());
+    }catch(Exception e){
+        return null;
     }
 }
+
+    public int ping() throws MainzellisteNetworkException {
+        MainzellisteResponse response = connection.doRequest(RequestMethod.DELETE, "", null);
+        return response.getStatusCode();
+    }
+
+}
+
+
+
+//Session session = mainzelliste.getSession();}
+//}

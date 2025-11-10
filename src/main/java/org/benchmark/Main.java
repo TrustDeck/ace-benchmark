@@ -28,30 +28,33 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.benchmark.connector.MConnectorFactory;
+import org.benchmark.connector.TConnectorFactory;
+import org.benchmark.connector.mainzelliste.MainzellisteConnectorFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import org.benchmark.connector.BenchmarkException;
-import org.benchmark.connector.trustdeck.TrustDeckConnectorFactory;
-import org.mainzelliste.benchmark.ConnectorFactory;
+
 
 
 /**
  * Main class of the benchmark driver.
- * 
+ *
  * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
  */
 public class Main {
 
     public static void main(String[] args) throws IOException, BenchmarkException {
-    	
-    	// Load configuration from file
+
+        // Load configuration from file
         Yaml yaml = new Yaml();
         InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("config.yaml");
         Map<String, Object> yamlConfig = yaml.load(inputStream);
 
         // Extract the benchmark configuration from the loaded configuration file
         @SuppressWarnings("unchecked")
-		Map<String, Object> benchmarkConfig = (Map<String, Object>) yamlConfig.get("benchmark");
+        Map<String, Object> benchmarkConfig = (Map<String, Object>) yamlConfig.get("benchmark");
         final int INITIAL_DB_SIZE = (int) benchmarkConfig.get("initialDbSize");
         final int MAX_TIME = (int) benchmarkConfig.get("maxTime");
         final int REPORTING_INTERVAL = (int) benchmarkConfig.get("reportingInterval");
@@ -95,28 +98,43 @@ public class Main {
         // Some logging
         System.out.println("\n++++++++++++++++++++++++++++ ACE Benchmark ++++++++++++++++++++++++++++\n");
 
-    // Log total number of configs
+        // Log total number of configs
         System.out.println("Total configurations to run: " + configs.size());
 
-        ConnectorFactory factory = new TrustDeckConnectorFactory();
+//        ConnectorFactory factory = new TrustDeckConnectorFactory();
+//        for (int i = 0; i < configs.size(); i++) {
+//            Configuration config = configs.get(i);
+//            System.out.println("Running configuration " + (i + 1) + " of " + configs.size() +
+//                    ": " + config.getName() + " (" + (configs.size() - i - 1) + " left after this)");
+//            execute(config, factory);
+//        }
+
+//        TConnectorFactory factory = new  TrustDeckConnectorFactory();
+
+        MConnectorFactory factory = new  MainzellisteConnectorFactory();
         for (int i = 0; i < configs.size(); i++) {
             Configuration config = configs.get(i);
             System.out.println("Running configuration " + (i + 1) + " of " + configs.size() +
                     ": " + config.getName() + " (" + (configs.size() - i - 1) + " left after this)");
             execute(config, factory);
         }
+
     }
-    
+
     /**
      * Executes a configuration.
-     * 
+     *
      * @param config The configuration object that should be used to run the benchmark
      * @throws IOException
      * @throws URISyntaxException
      * @throws BenchmarkException
      */
     private static final void execute(Configuration config,
-                                      ConnectorFactory factory) throws IOException, BenchmarkException {
+                                      MConnectorFactory factory) throws IOException, BenchmarkException {
+
+
+//        private static final void execute(Configuration config,
+//                TConnectorFactory factory) throws IOException, BenchmarkException {
         // Identifiers
         System.out.print("\r - Preparing benchmark: creating identifiers                      ");
         Identifiers identifiers = new Identifiers();
@@ -126,83 +144,83 @@ public class Main {
         System.out.print("\r - Preparing benchmark: creating statistics                      ");
         Statistics statistics = new Statistics(config);
         System.out.println("\r - Preparing benchmark: creating statistics\t\t\t[DONE]");
-        
+
         // Provider
         System.out.print("\r - Preparing benchmark: creating work provider                      ");
         WorkProvider provider = new WorkProvider(config, identifiers, statistics, factory);
         System.out.println("\r - Preparing benchmark: creating work provider\t\t\t[DONE]");
-        
+
 
         // Prepare
         System.out.print("\r - Preparing benchmark: purge database and re-initialize        ");
         provider.prepare();
         System.out.println("\r - Preparing benchmark: purge database and re-initialize\t[DONE]");
-        
+
         // Some logging
         System.out.println("\r - Preparing benchmark: Done");
-        
+
         // Some logging
         System.out.println("\n - Executing configuration: " + config.getName());
-        
+
         // Start workers
         statistics.start();
         for (int i = 0; i < config.getNumThreads(); i++) {
             new Worker(provider).start();
         }
-        
+
         // Some logging
         System.out.println("   - Number of workers launched: " + config.getNumThreads());
-        
+
         // Files to write to
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(config.getName() + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv")));
         BufferedWriter dbWriter = config.isReportDBSpace() ? new BufferedWriter(new FileWriter(new File(config.getName() + "_DB_STORAGE-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv"))) : null;
-        
+
         // Event and logging loop
         while (true) {
-            
+
             // Reporting
             if (System.currentTimeMillis() - statistics.getLastTime() >= config.getReportingInterval()) {
                 statistics.report(writer);
                 writer.flush();
-                
+
                 // Calculate Progress
                 double progress = (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d;
-                
+
                 // Print progress
                 System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)       ");
             }
-            
-            // Reporting DB storage size
-            if (config.isReportDBSpace() && System.currentTimeMillis() - statistics.getLastTimeDB() >= config.getReportingIntervalDBSpace()) {
-                statistics.reportDBStorage(dbWriter, provider);
-                dbWriter.flush();
-            }
+//
+//            // Reporting DB storage size
+//            if (config.isReportDBSpace() && System.currentTimeMillis() - statistics.getLastTimeDB() >= config.getReportingIntervalDBSpace()) {
+//                statistics.reportDBStorage(dbWriter, provider);
+//                dbWriter.flush();
+//            }
 
             // End of experiment
             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
-            	System.out.println("\r   - Progress: 100 %                             ");
+                System.out.println("\r   - Progress: 100 %                             ");
                 break;
             }
-            
+
             // Sleep
             try {
                 Thread.sleep(100); // 0.1 second
             } catch (InterruptedException e) {
                 break;
             }
-            
+
             // Interrupted?
             if (Thread.interrupted()) {
                 break;
             }
         }
-        
+
         // Close writer
         writer.close();
         if (config.isReportDBSpace()) {
-        	dbWriter.close();
+            dbWriter.close();
         }
-        
+
 //        // Close factory and free all resources
 //        factory.shutdown();
 
