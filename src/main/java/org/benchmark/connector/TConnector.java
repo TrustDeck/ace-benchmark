@@ -26,9 +26,10 @@ import org.trustdeck.client.model.Domain;
  */
 public interface TConnector {
 
-    /** Prepares the benchmark environment. */
+    /**
+     * Prepares the benchmark environment.
+     */
     public void prepare() throws BenchmarkException;
-
 
 
     /** Creates a new domain. */

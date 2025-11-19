@@ -17,11 +17,15 @@
 
 package org.benchmark;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import de.pseudonymisierung.mainzelliste.client.InvalidSessionException;
+import de.pseudonymisierung.mainzelliste.client.MainzellisteNetworkException;
+import org.benchmark.connector.BenchmarkException;
+import org.benchmark.connector.MConnectorFactory;
+import org.benchmark.connector.mainzelliste.MainzellisteConnectorFactory;
+import org.codehaus.jettison.json.JSONException;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.*;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,23 +33,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.benchmark.connector.MConnectorFactory;
-import org.benchmark.connector.TConnectorFactory;
-import org.benchmark.connector.mainzelliste.MainzellisteConnectorFactory;
-import org.yaml.snakeyaml.Yaml;
-
-import org.benchmark.connector.BenchmarkException;
-
-
 
 /**
  * Main class of the benchmark driver.
  *
  * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
  */
+
+// TODO - switch from TRUstdeck and Mainszeliiste using config or using flag
+    // make a document if 1. changes to main benchmark, creation of new benchmark and the mainzelliste benchmark!
 public class Main {
 
-    public static void main(String[] args) throws IOException, BenchmarkException {
+    public static void main(String[] args) throws IOException, BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException {
 
         // Load configuration from file
         Yaml yaml = new Yaml();
@@ -53,8 +52,7 @@ public class Main {
         Map<String, Object> yamlConfig = yaml.load(inputStream);
 
         // Extract the benchmark configuration from the loaded configuration file
-        @SuppressWarnings("unchecked")
-        Map<String, Object> benchmarkConfig = (Map<String, Object>) yamlConfig.get("benchmark");
+        @SuppressWarnings("unchecked") Map<String, Object> benchmarkConfig = (Map<String, Object>) yamlConfig.get("benchmark");
         final int INITIAL_DB_SIZE = (int) benchmarkConfig.get("initialDbSize");
         final int MAX_TIME = (int) benchmarkConfig.get("maxTime");
         final int REPORTING_INTERVAL = (int) benchmarkConfig.get("reportingInterval");
@@ -64,8 +62,7 @@ public class Main {
         final int NUMBER_OF_REPETITIONS = (int) benchmarkConfig.get("numberOfRepetitions");
 
         // Extract the scenario configurations from the loaded configuration file
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> scenarios = (List<Map<String, Object>>) benchmarkConfig.get("scenarios");
+        @SuppressWarnings("unchecked") List<Map<String, Object>> scenarios = (List<Map<String, Object>>) benchmarkConfig.get("scenarios");
 
         // Create configs
         List<Configuration> configs = new ArrayList<>();
@@ -78,20 +75,7 @@ public class Main {
             int pingRate = scenario.containsKey("pingRate") ? (int) scenario.get("pingRate") : 0;
 
             for (int i = 0; i < NUMBER_OF_REPETITIONS; i++) {
-                configs.add(Configuration.builder()
-                        .setCreateRate(createRate)
-                        .setReadRate(readRate)
-                        .setUpdateRate(updateRate)
-                        .setDeleteRate(deleteRate)
-                        .setPingRate(pingRate)
-                        .setInitialDBSize(INITIAL_DB_SIZE)
-                        .setMaxTime(MAX_TIME)
-                        .setName(name + "-" + NUM_THREADS + "-threads")
-                        .setNumThreads(NUM_THREADS)
-                        .setReportingInterval(REPORTING_INTERVAL)
-                        .setReportingIntervalDBSpace(REPORTING_INTERVAL_DB_SPACE)
-                        .setReportDBSpace(REPORT_DB_SPACE)
-                        .build());
+                configs.add(Configuration.builder().setCreateRate(createRate).setReadRate(readRate).setUpdateRate(updateRate).setDeleteRate(deleteRate).setPingRate(pingRate).setInitialDBSize(INITIAL_DB_SIZE).setMaxTime(MAX_TIME).setName(name + "-" + NUM_THREADS + "-threads").setNumThreads(NUM_THREADS).setReportingInterval(REPORTING_INTERVAL).setReportingIntervalDBSpace(REPORTING_INTERVAL_DB_SPACE).setReportDBSpace(REPORT_DB_SPACE).build());
             }
         }
 
@@ -101,7 +85,8 @@ public class Main {
         // Log total number of configs
         System.out.println("Total configurations to run: " + configs.size());
 
-//        ConnectorFactory factory = new TrustDeckConnectorFactory();
+
+//     TODO   ConnectorFactory factory = new TrustDeckConnectorFactory();
 //        for (int i = 0; i < configs.size(); i++) {
 //            Configuration config = configs.get(i);
 //            System.out.println("Running configuration " + (i + 1) + " of " + configs.size() +
@@ -111,11 +96,10 @@ public class Main {
 
 //        TConnectorFactory factory = new  TrustDeckConnectorFactory();
 
-        MConnectorFactory factory = new  MainzellisteConnectorFactory();
+        MConnectorFactory factory = new MainzellisteConnectorFactory();
         for (int i = 0; i < configs.size(); i++) {
             Configuration config = configs.get(i);
-            System.out.println("Running configuration " + (i + 1) + " of " + configs.size() +
-                    ": " + config.getName() + " (" + (configs.size() - i - 1) + " left after this)");
+            System.out.println("Running configuration " + (i + 1) + " of " + configs.size() + ": " + config.getName() + " (" + (configs.size() - i - 1) + " left after this)");
             execute(config, factory);
         }
 
@@ -129,8 +113,7 @@ public class Main {
      * @throws URISyntaxException
      * @throws BenchmarkException
      */
-    private static final void execute(Configuration config,
-                                      MConnectorFactory factory) throws IOException, BenchmarkException {
+    private static final void execute(Configuration config, MConnectorFactory factory) throws IOException, BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException {
 
 
 //        private static final void execute(Configuration config,
@@ -184,17 +167,12 @@ public class Main {
                 writer.flush();
 
                 // Calculate Progress
-                double progress = (double)((int)(((double)(System.currentTimeMillis() - statistics.getStartTime())/(double)config.getMaxTime()) * 1000d))/10d;
+                double progress = (double) ((int) (((double) (System.currentTimeMillis() - statistics.getStartTime()) / (double) config.getMaxTime()) * 1000d)) / 10d;
 
                 // Print progress
                 System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)       ");
             }
-//
-//            // Reporting DB storage size
-//            if (config.isReportDBSpace() && System.currentTimeMillis() - statistics.getLastTimeDB() >= config.getReportingIntervalDBSpace()) {
-//                statistics.reportDBStorage(dbWriter, provider);
-//                dbWriter.flush();
-//            }
+
 
             // End of experiment
             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
@@ -221,8 +199,6 @@ public class Main {
             dbWriter.close();
         }
 
-//        // Close factory and free all resources
-//        factory.shutdown();
 
         // Some logging
         System.out.println(" - Done\n");

@@ -15,6 +15,8 @@ import java.util.Map;
 @Slf4j
 public class MainzellisteConnectorFactory implements MConnectorFactory {
 
+    Session session;
+
     public  MainzellisteConnector create() throws BenchmarkException {
         /// 1. Create connection instance and session
 
@@ -28,21 +30,26 @@ public class MainzellisteConnectorFactory implements MConnectorFactory {
 
 
             MainzellisteConnection connection = new MainzellisteConnection(toolConfig.get("uri"), toolConfig.get("apiKey"));
-            log.debug("connection created");
+            log.info("connection created");
 
-            Session session = connection.createSession();
-            log.debug("Session created with ID: {}", session.getURI());
-
-            Validator validator = connection.createValidator();
-            log.debug("validator created {}", validator);
+            this.session = connection.createSession();
+            log.info("Session created with ID: {}", session.getURI());
 
 
-            return new MainzellisteConnector(connection, session,validator);
+            return new MainzellisteConnector(connection, session);
         } catch (Exception e) {
-            log.info("URI syntax exception occurred, please check the URI ;{}", e.getMessage());
+            log.info(e.getMessage());
         }
         return null;
     }
+    public String destroySession() throws MainzellisteNetworkException {
+        this.session.destroy();
+        return "Session destroyed";
+    }
+
+//    public String getTokens(){
+//        this.session.getTokens()
+//    }
 }
 
 

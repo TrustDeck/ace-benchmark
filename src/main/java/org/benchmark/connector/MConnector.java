@@ -6,27 +6,37 @@ import de.pseudonymisierung.mainzelliste.client.MainzellisteNetworkException;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.Map;
+
 public interface MConnector {
     // TODO- verify return types
 
-        /** Prepares the benchmark environment. */
-        public void prepare() throws BenchmarkException;
+    /**
+     * Prepares the benchmark environment.
+     */
+    public void prepare() throws BenchmarkException;
 
 
-        /**
-         * Add patient.
-         */
-        public JSONObject addPatient(String IdType, String IdString) throws BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException;
+    /**
+     * Add patient.
+     */
+    public Map<String, String> addPatient() throws BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException;
 
-        /** Read patient. */
-        public String readPatient(ID patientId) throws BenchmarkException, InvalidSessionException, MainzellisteNetworkException;
+    /**
+     * Read patient.
+     */
+    public String readPatient(ID patientId) throws BenchmarkException, InvalidSessionException, MainzellisteNetworkException;
 
-        /** Edit patient. */
-        public String editPatient(ID patientId) throws BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException;
+    /**
+     * Edit patient.
+     */
+    public String editPatient(ID patientId) throws BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException;
 
-        /** Delete atient. */
-        public String deletePatient(ID patientId) throws BenchmarkException, InvalidSessionException, MainzellisteNetworkException;
+    /**
+     * Delete atient.
+     */
+    public String deletePatient(ID patientId) throws BenchmarkException, InvalidSessionException, MainzellisteNetworkException;
 
 
-        public int ping() throws BenchmarkException, MainzellisteNetworkException;
+    public int ping() throws BenchmarkException, MainzellisteNetworkException;
 }

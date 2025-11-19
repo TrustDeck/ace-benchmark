@@ -18,12 +18,14 @@ package org.benchmark.connector;
 
 /**
  * A factory for connectors.
- * 
+ *
  * @author Fabian Prasser
  */
-public interface MConnectorFactory{
+public interface MConnectorFactory {
 
-    /** Create a connector. */
+    /**
+     * Create a connector.
+     */
     public MConnector create() throws BenchmarkException;
 
 

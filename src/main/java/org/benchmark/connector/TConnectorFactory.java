@@ -18,7 +18,7 @@ package org.benchmark.connector;
 
 /**
  * A factory for connectors.
- * 
+ *
  * @author Fabian Prasser
  */
 public interface TConnectorFactory {
