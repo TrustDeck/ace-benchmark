@@ -92,7 +92,7 @@ public class TrustDeckConnector implements Connector {
         try {
 
             this.clearTables();
-            Thread.sleep(15000);
+            Thread.sleep(5000);
             log.info("pseudonym size after - {}", this.getStorageConsumption("pseudonym"));
             this.deleteDomainRightsAndRoles(this.domain);
             this.createDomain(this.domain);
@@ -112,10 +112,10 @@ public class TrustDeckConnector implements Connector {
         } catch (TrustDeckClientLibraryException e) {
             if (e.getResponseStatusCode() != null && e.getResponseStatusCode().value() == 404) {
 //                // Ignore 404 errors
-//                return;
-//
-                throw new BenchmarkException(e);  // Throw non-404 errors
             }
+            log.debug("Ping not successful :{}", e.getMessage());
+        } catch (Exception e) {
+            throw new BenchmarkException(e);
         }
 
     }
