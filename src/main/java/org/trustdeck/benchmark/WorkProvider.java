@@ -81,8 +81,7 @@ public class WorkProvider {
     
     /**
      * Prepare the benchmark run.
-     * 
-     * @param connector
+     *
      * @throws ConnectorException
      */
     public void prepare() throws ConnectorException {

@@ -38,7 +38,7 @@ import org.yaml.snakeyaml.Yaml;
 /**
  * Main class of the benchmark driver.
  *
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin Müller, Felix N. Wirth, Fabian Prasser and Chethan C. Nagaraj,
  */
 public class Main {
 
@@ -50,8 +50,7 @@ public class Main {
         Map<String, Object> yamlConfig = yaml.load(inputStream);
 
         // Extract the benchmark configuration from the loaded configuration file
-        @SuppressWarnings("unchecked")
-        Map<String, Object> benchmarkConfig = (Map<String, Object>) yamlConfig.get("benchmark");
+        @SuppressWarnings("unchecked") Map<String, Object> benchmarkConfig = (Map<String, Object>) yamlConfig.get("benchmark");
         final int INITIAL_DB_SIZE = (int) benchmarkConfig.get("initialDbSize");
         final int MAX_TIME = (int) benchmarkConfig.get("maxTime");
         final int REPORTING_INTERVAL = (int) benchmarkConfig.get("reportingInterval");
@@ -61,8 +60,7 @@ public class Main {
         final int NUMBER_OF_REPETITIONS = (int) benchmarkConfig.get("numberOfRepetitions");
 
         // Extract the scenario configurations from the loaded configuration file
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> scenarios = (List<Map<String, Object>>) benchmarkConfig.get("scenarios");
+        @SuppressWarnings("unchecked") List<Map<String, Object>> scenarios = (List<Map<String, Object>>) benchmarkConfig.get("scenarios");
 
         // Create configs
         List<Configuration> configs = new ArrayList<>();
@@ -75,20 +73,7 @@ public class Main {
             int pingRate = scenario.containsKey("pingRate") ? (int) scenario.get("pingRate") : 0;
 
             for (int i = 0; i < NUMBER_OF_REPETITIONS; i++) {
-                configs.add(Configuration.builder()
-                        .setCreateRate(createRate)
-                        .setReadRate(readRate)
-                        .setUpdateRate(updateRate)
-                        .setDeleteRate(deleteRate)
-                        .setPingRate(pingRate)
-                        .setInitialDBSize(INITIAL_DB_SIZE)
-                        .setMaxTime(MAX_TIME)
-                        .setName(name + "-" + NUM_THREADS + "-threads")
-                        .setNumThreads(NUM_THREADS)
-                        .setReportingInterval(REPORTING_INTERVAL)
-                        .setReportingIntervalDBSpace(REPORTING_INTERVAL_DB_SPACE)
-                        .setReportDBSpace(REPORT_DB_SPACE)
-                        .build());
+                configs.add(Configuration.builder().setCreateRate(createRate).setReadRate(readRate).setUpdateRate(updateRate).setDeleteRate(deleteRate).setPingRate(pingRate).setInitialDBSize(INITIAL_DB_SIZE).setMaxTime(MAX_TIME).setName(name + "-" + NUM_THREADS + "-threads").setNumThreads(NUM_THREADS).setReportingInterval(REPORTING_INTERVAL).setReportingIntervalDBSpace(REPORTING_INTERVAL_DB_SPACE).setReportDBSpace(REPORT_DB_SPACE).build());
             }
         }
 
@@ -117,8 +102,7 @@ public class Main {
      * @throws ConnectorException
      */
     // java
-    private static final void execute(Configuration config,
-                                      ConnectorFactory factory) throws IOException, ConnectorException, ConnectorException {
+    private static final void execute(Configuration config, ConnectorFactory factory) throws IOException, ConnectorException, ConnectorException {
         // Identifiers
         System.out.print("\r - Preparing benchmark: creating identifiers                      ");
         Identifiers identifiers = new Identifiers();
@@ -134,7 +118,6 @@ public class Main {
         WorkProvider provider = new WorkProvider(config, identifiers, statistics, factory);
         System.out.println("\r - Preparing benchmark: creating work provider\t\t\t[DONE]");
 
-
         // Prepare
         System.out.print("\r - Preparing benchmark: purge database and re-initialize        ");
         provider.prepare();
@@ -144,7 +127,7 @@ public class Main {
         System.out.println("\r - Preparing benchmark: Done");
         System.out.println("\n - Executing configuration: " + config.getName());
 
-        // Start workers
+        // Start workers and them to a list to collectively monitor and manage the workers.
         statistics.start();
         List<Thread> workers = new ArrayList<>();
         for (int i = 0; i < config.getNumThreads(); i++) {
@@ -169,16 +152,14 @@ public class Main {
                     writer.flush();
 
                     // Calculate Progress
-                    double progress = (double) ((int) (((double) (System.currentTimeMillis() - statistics.getStartTime())
-                            / (double) config.getMaxTime()) * 1000d)) / 10d;
+                    double progress = (double) ((int) (((double) (System.currentTimeMillis() - statistics.getStartTime()) / (double) config.getMaxTime()) * 1000d)) / 10d;
 
                     // Print progress
                     System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)       ");
                 }
 
                 // Reporting DB storage size
-                if (config.isReportDBSpace()
-                        && System.currentTimeMillis() - statistics.getLastTimeDB() >= config.getReportingIntervalDBSpace()) {
+                if (config.isReportDBSpace() && System.currentTimeMillis() - statistics.getLastTimeDB() >= config.getReportingIntervalDBSpace()) {
                     statistics.reportDBStorage(dbWriter, provider);
                     dbWriter.flush();
                 }
@@ -215,6 +196,7 @@ public class Main {
             try {
                 writer.close();
             } catch (IOException e) { /* ignore */ }
+
 
             if (dbWriter != null) {
                 try {
