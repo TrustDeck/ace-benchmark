@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.benchmark;
+package org.benchmark.connector;
 
 import lombok.Getter;
 

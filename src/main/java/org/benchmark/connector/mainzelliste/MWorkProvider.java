@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.benchmark;
+package org.benchmark.connector.mainzelliste;
 
 import de.pseudonymisierung.mainzelliste.client.ID;
 import de.pseudonymisierung.mainzelliste.client.InvalidSessionException;
 import de.pseudonymisierung.mainzelliste.client.MainzellisteNetworkException;
 import org.benchmark.connector.BenchmarkException;
-import org.benchmark.connector.MConnector;
-import org.benchmark.connector.MConnectorFactory;
+import org.benchmark.connector.Configuration;
+import org.benchmark.connector.mainzelliste.Statistics;
 import org.codehaus.jettison.json.JSONException;
 
 import java.util.List;
@@ -34,7 +34,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
  */
-public class WorkProvider {
+public class MWorkProvider {
 
     // List to store created patient IDs
     private final List<Map<String, String>> createdIds = new CopyOnWriteArrayList<>();
@@ -44,21 +44,12 @@ public class WorkProvider {
     private Configuration config;
 
 
-    // TODO-check if needed for Mainz
     /**
      * The work distribution according to the scenario.
      */
     private WorkDistribution distribution;
 
-    /**
-     * The set of identifiers used to create/access pseudonym-objects.
-     */
-    private Identifiers identifiers;
 
-// TODO-move to seperate
-
-//    /** Thread local connectors*/
-//    private ThreadLocal<TConnector> threadLocalConnectors;
 
     /**
      * The statistics object.
@@ -70,22 +61,14 @@ public class WorkProvider {
      * Creates a new instance.
      *
      * @param config
-     * @param identifiers
      * @param statistics
      * @param factory
      */
 
-    // TODO-move to seperate
-
-//    public WorkProvider(Configuration config,
-//                        Identifiers identifiers,
-//                        Statistics statistics,
-//                        TConnectorFactory factory) {
-    public WorkProvider(Configuration config, Identifiers identifiers, Statistics statistics, MConnectorFactory factory) {
+    public MWorkProvider(Configuration config, Statistics statistics, MConnectorFactory factory) {
 
         // Store config
         this.config = config;
-        this.identifiers = identifiers;
         this.statistics = statistics;
 
 
@@ -110,7 +93,6 @@ public class WorkProvider {
         // Remove old data and create benchmark table
         threadLocalConnectors.get().prepare();
 
-        //TODO- check this once
 
         // Create initial patient pool
         for (int i = 0; i < config.getInitialDBSize(); i++) {
@@ -127,11 +109,10 @@ public class WorkProvider {
      */
     public Runnable getWork() {
 
-        //TODO-move to seperate
-//        TConnector connector = threadLocalConnectors.get();
 
         //  Obtain thread-local mainzelliste connector instances
         MConnector connector = threadLocalConnectors.get();
+
 
 
         // Get the template according to the defined distribution
@@ -147,6 +128,7 @@ public class WorkProvider {
                             // Pass both the ID and patient fields
                             Map<String, String> createdId = connector.addPatient();
                             createdIds.add(createdId);
+                            statistics.addCreate();
                         } catch (Exception e) {
                             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
                                 // Work submitted shortly before the benchmark was terminated might still be processed.
@@ -155,7 +137,7 @@ public class WorkProvider {
                                 throw new RuntimeException(e);
                             }
                         }
-                        statistics.addCreate();
+
                     }
                 };
             case READ:
@@ -167,6 +149,7 @@ public class WorkProvider {
                                 String idType = x.get("idType");
                                 String idString = x.get("idString");
                                 connector.readPatient(new ID(idType, idString));
+                                statistics.addRead();
                             }
 
                         } catch (BenchmarkException | InvalidSessionException | MainzellisteNetworkException e) {
@@ -179,7 +162,7 @@ public class WorkProvider {
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
-                        statistics.addRead();
+
                     }
                 };
             case UPDATE:
@@ -192,6 +175,7 @@ public class WorkProvider {
                                 String idType = x.get("idType");
                                 String idString = x.get("idString");
                                 connector.editPatient(new ID(idType, idString));
+                                statistics.addUpdate();
                             }
                         } catch (Exception e) {
                             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
@@ -201,7 +185,7 @@ public class WorkProvider {
                                 throw new RuntimeException(e);
                             }
 
-                            statistics.addUpdate();
+
                         }
                     }
                 };
@@ -215,6 +199,7 @@ public class WorkProvider {
                                 String idType = x.get("idType");
                                 String idString = x.get("idString");
                                 connector.deletePatient(new ID(idType, idString));
+                                statistics.addDelete();
                             }
                         } catch (Exception e) {
                             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
@@ -224,7 +209,7 @@ public class WorkProvider {
                                 throw new RuntimeException(e);
                             }
                         }
-                        statistics.addDelete();
+
                     }
                 };
             case PING:
@@ -233,6 +218,7 @@ public class WorkProvider {
                     public void run() {
                         try {
                             connector.ping();
+                            statistics.addPing();
                         } catch (MainzellisteNetworkException e) {
                             if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
                                 // Work submitted shortly before the benchmark was terminated might still be processed.
@@ -241,7 +227,7 @@ public class WorkProvider {
                                 throw new RuntimeException(e);
                             }
                         }
-                        statistics.addPing();
+
                     }
                 };
         }

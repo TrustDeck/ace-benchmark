@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.benchmark;
+package org.benchmark.connector.mainzelliste;
 
 /**
  * This class represents a thread that performs dedicated work.
@@ -25,14 +25,14 @@ package org.benchmark;
 public class Worker extends Thread {
     
     /** Work provider. */
-    private WorkProvider provider;
+    private MWorkProvider provider;
     
     /**
      * Creates a new instance.
 
      * @param provider
      */
-    public Worker(WorkProvider provider) {
+    public Worker(MWorkProvider provider) {
         this.provider = provider;
         this.setDaemon(true);
     }

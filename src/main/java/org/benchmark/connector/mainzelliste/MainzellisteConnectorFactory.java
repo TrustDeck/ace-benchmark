@@ -1,15 +1,11 @@
 package org.benchmark.connector.mainzelliste;
 
 import de.pseudonymisierung.mainzelliste.client.*;
-import org.benchmark.connector.MConnectorFactory;
-import org.codehaus.jettison.json.JSONObject;
-import org.benchmark.Main;
 import org.benchmark.connector.BenchmarkException;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j

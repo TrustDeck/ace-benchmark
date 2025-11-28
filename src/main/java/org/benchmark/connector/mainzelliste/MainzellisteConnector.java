@@ -18,16 +18,14 @@ package org.benchmark.connector.mainzelliste;
 
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.benchmark.connector.BenchmarkException;
-import org.benchmark.connector.MConnector;
 import de.pseudonymisierung.mainzelliste.client.*;
 import de.pseudonymisierung.mainzelliste.client.MainzellisteConnection.RequestMethod;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.benchmark.connector.BenchmarkException;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.trustdeck.client.exception.TrustDeckClientLibraryException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,18 +49,17 @@ public class MainzellisteConnector implements MConnector {
 
     }
 
+// NOTE: Clear tables not implemented, Truncate tables as a workaround, Implementation to be considered for Future Works.
     public void prepare() throws BenchmarkException {
-
-        try {
-            String prepareResponse = this.connection.clearTables(this.session);
-            log.info("prepare Response :{}",prepareResponse );
-            Thread.sleep(5000);
-            log.info("Tables cleared successfully");
-        } catch (TrustDeckClientLibraryException | InterruptedException e) {
-            // Ignore
-        } catch (Exception e) {
-            throw new BenchmarkException(e);
-        }
+//        try {
+////            this.connection.clearTables(this.session);
+////            Thread.sleep(5000);
+////            log.debug("Tables cleared successfully");
+//        } catch (TrustDeckClientLibraryException | InterruptedException e) {
+//            // Ignore
+//        } catch (Exception e) {
+//            throw new BenchmarkException(e);
+//        }
     }
 
 
@@ -75,7 +72,7 @@ public class MainzellisteConnector implements MConnector {
         addPatToken.addField("vorname", RandomStringUtils.randomAlphabetic(5));
         addPatToken.addField("nachname", RandomStringUtils.randomAlphabetic(5));
         addPatToken.addField("geburtstag", String.format("%02d", 1 + random.nextInt(30) + 1));
-        addPatToken.addField("geburtsmonat", "01");
+        addPatToken.addField("geburtsmonat", String.format("%02d", random.nextInt(12 ) + 1));
         addPatToken.addField("geburtsjahr", "1989");
 
         // convert token to JSON object.
@@ -89,13 +86,19 @@ public class MainzellisteConnector implements MConnector {
         // Using Client library, send API request to create Patient using token id and token Json object.
         MainzellisteResponse addPatientResponse = connection.doRequest(RequestMethod.POST, "patients?tokenId=" + addPatTokenId, String.valueOf(addPatTokenJSON));
         log.debug("Created Patient details -{} ", addPatientResponse.getStatusCode());
+        try{
         JSONArray responseJsonArray = new JSONArray(addPatientResponse.getData());
         JSONObject responseJsonObject = responseJsonArray.getJSONObject(0);
+
         Map<String, String> createdPatientIds = new ConcurrentHashMap<>();
         createdPatientIds.put("idType", responseJsonObject.getString("idType"));
         createdPatientIds.put("idString", responseJsonObject.getString("idString"));
-        log.info("Created Map of IDS {}", createdPatientIds);
-        return createdPatientIds;
+        log.debug("Created Map of IDS {}", createdPatientIds);
+        return createdPatientIds;}
+        catch(Exception e){
+            log.warn(e.getMessage());
+            return null;
+        }
     }
 
     public String readPatient(ID patientId) throws InvalidSessionException, MainzellisteNetworkException {
@@ -113,7 +116,7 @@ public class MainzellisteConnector implements MConnector {
             // Make the GET request
             MainzellisteResponse readPatientResponse = connection.doRequest(RequestMethod.GET, "patients?tokenId=" + readPatientstokenId, null);
 
-            log.info("Read patient response: {}", readPatientResponse.getData());
+            log.debug("Read patient response: {}", readPatientResponse.getData());
             return readPatientResponse.getData();
         } catch (Exception e) {
             log.warn("READ FAILED {}", e.getMessage());
@@ -147,9 +150,6 @@ public class MainzellisteConnector implements MConnector {
             return null;
         }
     }
-// TODO - See if the number of Mainyelliste fails, if less, ignore, if more, raise Exception,
-//  catch it first, then the normal Exception and rethrow as RuntimeException,
-//  delete Benchmark exception class and chec
 
     public String deletePatient(ID id) throws InvalidSessionException, MainzellisteNetworkException {
         try {
@@ -179,7 +179,3 @@ public class MainzellisteConnector implements MConnector {
     }
 
 }
-
-
-//Session session = mainzelliste.getSession();}
-//}

@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.benchmark.connector;
+package org.benchmark.connector.trustdeck;
 
+import org.benchmark.connector.BenchmarkException;
 import org.trustdeck.client.model.Domain;
 
 /**

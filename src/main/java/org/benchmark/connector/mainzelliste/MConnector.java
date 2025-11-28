@@ -1,15 +1,14 @@
-package org.benchmark.connector;
+package org.benchmark.connector.mainzelliste;
 
 import de.pseudonymisierung.mainzelliste.client.ID;
 import de.pseudonymisierung.mainzelliste.client.InvalidSessionException;
 import de.pseudonymisierung.mainzelliste.client.MainzellisteNetworkException;
+import org.benchmark.connector.BenchmarkException;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Map;
 
 public interface MConnector {
-    // TODO- verify return types
 
     /**
      * Prepares the benchmark environment.

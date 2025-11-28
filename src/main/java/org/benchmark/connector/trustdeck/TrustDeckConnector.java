@@ -19,7 +19,6 @@ package org.benchmark.connector.trustdeck;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.benchmark.connector.BenchmarkException;
-import org.benchmark.connector.TConnector;
 import org.trustdeck.client.TrustDeckClient;
 import org.trustdeck.client.exception.TrustDeckClientLibraryException;
 import org.trustdeck.client.exception.TrustDeckResponseException;
@@ -34,7 +33,6 @@ import java.time.LocalDateTime;
  * Connector to ACE.
  *
  * @author Fabian Prasser, Armin Müller, Chethan Nagaraj
- * TODO Check if mainzelliste is reused, check if resttemplate should be shutdown, check if need to creadte DOmain , Psueodnonym models here
  */
 @Slf4j
 public class TrustDeckConnector implements TConnector{

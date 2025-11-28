@@ -19,13 +19,11 @@ package org.benchmark.connector.trustdeck;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.benchmark.connector.TConnectorFactory;
 import org.yaml.snakeyaml.Yaml;
 import lombok.extern.slf4j.Slf4j;
 
-import org.benchmark.Main;
+import org.benchmark.connector.mainzelliste.Main;
 import org.benchmark.connector.BenchmarkException;
-import org.benchmark.connector.TConnectorFactory;
 
 import org.trustdeck.client.TrustDeckClient;
 import org.trustdeck.client.config.TrustDeckClientConfig;

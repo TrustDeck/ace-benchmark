@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package org.benchmark;
+package org.benchmark.connector.trustdeck;
 
 import de.pseudonymisierung.mainzelliste.client.InvalidSessionException;
 import de.pseudonymisierung.mainzelliste.client.MainzellisteNetworkException;
 import org.benchmark.connector.BenchmarkException;
-import org.benchmark.connector.MConnectorFactory;
-import org.benchmark.connector.mainzelliste.MainzellisteConnectorFactory;
+import org.benchmark.connector.Configuration;
+
 import org.codehaus.jettison.json.JSONException;
 import org.yaml.snakeyaml.Yaml;
+import org.benchmark.connector.trustdeck.Statistics;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -40,8 +41,7 @@ import java.util.Map;
  * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
  */
 
-// TODO - switch from TRUstdeck and Mainszeliiste using config or using flag
-    // make a document if 1. changes to main benchmark, creation of new benchmark and the mainzelliste benchmark!
+
 public class Main {
 
     public static void main(String[] args) throws IOException, BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException {
@@ -86,17 +86,7 @@ public class Main {
         System.out.println("Total configurations to run: " + configs.size());
 
 
-//     TODO   ConnectorFactory factory = new TrustDeckConnectorFactory();
-//        for (int i = 0; i < configs.size(); i++) {
-//            Configuration config = configs.get(i);
-//            System.out.println("Running configuration " + (i + 1) + " of " + configs.size() +
-//                    ": " + config.getName() + " (" + (configs.size() - i - 1) + " left after this)");
-//            execute(config, factory);
-//        }
-
-//        TConnectorFactory factory = new  TrustDeckConnectorFactory();
-
-        MConnectorFactory factory = new MainzellisteConnectorFactory();
+        TConnectorFactory factory = new TrustDeckConnectorFactory();
         for (int i = 0; i < configs.size(); i++) {
             Configuration config = configs.get(i);
             System.out.println("Running configuration " + (i + 1) + " of " + configs.size() + ": " + config.getName() + " (" + (configs.size() - i - 1) + " left after this)");
@@ -113,11 +103,9 @@ public class Main {
      * @throws URISyntaxException
      * @throws BenchmarkException
      */
-    private static final void execute(Configuration config, MConnectorFactory factory) throws IOException, BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException {
+    private static final void execute(Configuration config, TConnectorFactory factory) throws IOException, BenchmarkException, InvalidSessionException, MainzellisteNetworkException, JSONException {
 
 
-//        private static final void execute(Configuration config,
-//                TConnectorFactory factory) throws IOException, BenchmarkException {
         // Identifiers
         System.out.print("\r - Preparing benchmark: creating identifiers                      ");
         Identifiers identifiers = new Identifiers();
@@ -130,7 +118,7 @@ public class Main {
 
         // Provider
         System.out.print("\r - Preparing benchmark: creating work provider                      ");
-        WorkProvider provider = new WorkProvider(config, identifiers, statistics, factory);
+        TWorkProvider provider = new TWorkProvider(config, identifiers, statistics, factory);
         System.out.println("\r - Preparing benchmark: creating work provider\t\t\t[DONE]");
 
 
@@ -145,11 +133,16 @@ public class Main {
         // Some logging
         System.out.println("\n - Executing configuration: " + config.getName());
 
-        // Start workers
+
+        // Start workers and keep references
         statistics.start();
+        List<Thread> workers = new ArrayList<>();
         for (int i = 0; i < config.getNumThreads(); i++) {
-            new Worker(provider).start();
+            Thread t = new Worker(provider);
+            workers.add(t);
+            t.start();
         }
+
 
         // Some logging
         System.out.println("   - Number of workers launched: " + config.getNumThreads());
@@ -158,49 +151,68 @@ public class Main {
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(config.getName() + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv")));
         BufferedWriter dbWriter = config.isReportDBSpace() ? new BufferedWriter(new FileWriter(new File(config.getName() + "_DB_STORAGE-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".csv"))) : null;
 
-        // Event and logging loop
-        while (true) {
+        try {
+            // Event and logging loop
+            while (true) {
+                // Reporting
+                if (System.currentTimeMillis() - statistics.getLastTime() >= config.getReportingInterval()) {
+                    statistics.report(writer);
+                    writer.flush();
 
-            // Reporting
-            if (System.currentTimeMillis() - statistics.getLastTime() >= config.getReportingInterval()) {
-                statistics.report(writer);
-                writer.flush();
+                    // Calculate Progress
+                    double progress = (double) ((int) (((double) (System.currentTimeMillis() - statistics.getStartTime())
+                            / (double) config.getMaxTime()) * 1000d)) / 10d;
 
-                // Calculate Progress
-                double progress = (double) ((int) (((double) (System.currentTimeMillis() - statistics.getStartTime()) / (double) config.getMaxTime()) * 1000d)) / 10d;
+                    // Print progress
+                    System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)       ");
+                }
 
-                // Print progress
-                System.out.print("\r   - Progress: " + progress + " % (currently " + statistics.getLastOverallTPS() + " TPS)       ");
+                // Reporting DB storage size
+                if (config.isReportDBSpace()
+                        && System.currentTimeMillis() - statistics.getLastTimeDB() >= config.getReportingIntervalDBSpace()) {
+                    statistics.reportDBStorage(dbWriter, provider);
+                    dbWriter.flush();
+                }
+
+                // End of experiment
+                if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
+                    System.out.println("\r   - Progress: 100 %                             ");
+                    break;
+                }
+
+                // Sleep
+                try {
+                    Thread.sleep(100); // 0.1 second
+                } catch (InterruptedException e) {
+                    break;
+                }
+
+                // Interrupted?
+                if (Thread.interrupted()) {
+                    break;
+                }
             }
-
-
-            // End of experiment
-            if (System.currentTimeMillis() - statistics.getStartTime() >= config.getMaxTime()) {
-                System.out.println("\r   - Progress: 100 %                             ");
-                break;
+        } finally {
+            // Stop and join workers before returning (prevents overlap with the next scenario's prepare)
+            for (Thread t : workers) t.interrupt();
+            for (Thread t : workers) {
+                try {
+                    t.join(5000); // waits 5 secs for each worker thread to stop
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
-
-            // Sleep
+            // Always close writers here
             try {
-                Thread.sleep(100); // 0.1 second
-            } catch (InterruptedException e) {
-                break;
+                writer.close();
+            } catch (IOException e) { /* ignore */ }
+
+            if (dbWriter != null) {
+                try {
+                    dbWriter.close();
+                } catch (IOException e) { /* ignore */ }
             }
-
-            // Interrupted?
-            if (Thread.interrupted()) {
-                break;
-            }
+            System.out.println(" - Done\n");
         }
-
-        // Close writer
-        writer.close();
-        if (config.isReportDBSpace()) {
-            dbWriter.close();
-        }
-
-
-        // Some logging
-        System.out.println(" - Done\n");
     }
 }
