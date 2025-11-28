@@ -113,10 +113,10 @@ public class TrustDeckConnector implements TConnector{
             this.trustDeckClient.ping();
             log.debug("\nPing successful");
         } catch (TrustDeckClientLibraryException e) {
-                if (e.getResponseStatusCode().value() == 404) {
-                    // Ignore 404 errors
-                    return;
-                }
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
+                return;
+            }
                 log.debug("\nPing failed with error status code :{}",e.getResponseStatusCode());
             } catch (Exception e) {
                 throw new BenchmarkException(e);
