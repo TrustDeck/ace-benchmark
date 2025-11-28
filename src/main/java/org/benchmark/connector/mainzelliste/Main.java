@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * Main class of the benchmark driver.
  *
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin Müller, Felix N. Wirth, Chethan C. Nagaraj and Fabian Prasser
  */
 
     // make a document if 1. changes to main benchmark, creation of new benchmark and the mainzelliste benchmark!

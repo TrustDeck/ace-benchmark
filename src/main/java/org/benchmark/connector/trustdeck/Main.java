@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * Main class of the benchmark driver.
  *
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin Müller, Felix N. Wirth, Chethan C. Nagaraj and Fabian Prasser
  */
 
 

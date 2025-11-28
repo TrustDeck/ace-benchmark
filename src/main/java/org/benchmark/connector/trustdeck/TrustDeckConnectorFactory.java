@@ -31,7 +31,7 @@ import org.trustdeck.client.config.TrustDeckClientConfig;
 /**
  * ACE mainzelliste factory.
  *
- * @author Fabian Prasser, Armin Müller, Chethan Nagaraj
+ * @author Fabian Prasser, Armin Müller, Chethan N. Nagaraj
  */
 @Slf4j
 public class TrustDeckConnectorFactory implements TConnectorFactory {

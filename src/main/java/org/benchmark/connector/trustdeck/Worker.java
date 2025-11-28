@@ -19,8 +19,8 @@ package org.benchmark.connector.trustdeck;
 
 /**
  * This class represents a thread that performs dedicated work.
- * 
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ *
+ * @author Armin Müller, Felix N. Wirth, Chethan C. Nagaraj and Fabian Prasser
  */
 public class Worker extends Thread {
     

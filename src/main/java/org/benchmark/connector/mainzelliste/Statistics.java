@@ -26,8 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class contains the statistics collected for benchmarking.
- * 
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ *
+ * @author Armin Müller, Felix N. Wirth, Chethan C. Nagaraj and Fabian Prasser
  */
 public class Statistics {
 

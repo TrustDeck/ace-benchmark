@@ -24,8 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Creates and accesses IDs by incrementing from a start number.
- * 
- * @author Felix Wirth, Armin Müller
+ *
+ * @author  Felix N. Wirth, Chethan C. Nagaraj and Fabian Prasser
  *
  */
 public class Identifiers {

@@ -32,7 +32,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Class that provides the work for the worker threads.
  *
- * @author Armin Müller, Felix N. Wirth, and Fabian Prasser
+ * @author Armin Müller, Felix N. Wirth, Chethan C. Nagaraj and Fabian Prasser
  */
 public class MWorkProvider {
 

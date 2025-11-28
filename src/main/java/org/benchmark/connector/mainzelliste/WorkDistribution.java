@@ -21,8 +21,8 @@ import java.util.Random;
 
 /**
  * This class handles the distribution of requests according to the scenario-configuration.
- * 
- * @author Fabian Prasser and Armin Müller
+ *
+ * @author Fabian Prasser, Chathan C. Nagaraj and Armin Müller
  */
 public class WorkDistribution {
     

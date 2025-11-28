@@ -30,7 +30,12 @@ import org.codehaus.jettison.json.JSONObject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+/**
+ * Implementation of {@link MConnector} for interacting with the Mainzelliste system.
+ * Provides methods to prepare the environment, add, read, edit, delete patients, and ping the server.
+ *
+ *  @author Armin Müller, Felix N. Wirth, Chethan C. Nagaraj and Fabian Prasser
+ */
 @Getter
 @Slf4j
 public class MainzellisteConnector implements MConnector {
@@ -40,7 +45,12 @@ public class MainzellisteConnector implements MConnector {
 
     private final Session session;
 
-
+    /**
+     * Constructs a new MainzellisteConnector.
+     *
+     * @param connection the MainzellisteConnection to use
+     * @param session the session for authentication and token management
+     */
     // Constructor
     public MainzellisteConnector(MainzellisteConnection connection, Session session
     ) {
@@ -48,13 +58,18 @@ public class MainzellisteConnector implements MConnector {
         this.session = session;
 
     }
+    /**
+     * Prepares the benchmark environment.
+     * Currently not implemented.
+     *
+     * @throws BenchmarkException if preparation fails
+     */
 
-// NOTE: Clear tables not implemented, Truncate tables as a workaround, Implementation to be considered for Future Works.
     public void prepare() throws BenchmarkException {
 //        try {
-////            this.connection.clearTables(this.session);
-////            Thread.sleep(5000);
-////            log.debug("Tables cleared successfully");
+//           this.connection.clearTables(this.session);
+//           Thread.sleep(5000);
+//          log.debug("Tables cleared successfully");
 //        } catch (TrustDeckClientLibraryException | InterruptedException e) {
 //            // Ignore
 //        } catch (Exception e) {
@@ -63,6 +78,11 @@ public class MainzellisteConnector implements MConnector {
     }
 
 
+    /**
+     * Adds a new patient to the Mainzelliste system.
+     *
+     * @return a map containing the created patient's ID type and ID string, or null if creation fails
+     */
     public Map<String, String> addPatient() throws InvalidSessionException, MainzellisteNetworkException, JSONException {
 
         // Prepare AddPatientToken Object
@@ -100,7 +120,13 @@ public class MainzellisteConnector implements MConnector {
             return null;
         }
     }
+    /**
+     * Reads patient data from the Mainzelliste system.
+     *
+     * @param patientId the ID of the patient to read
+     * @return the patient data as a JSON string, or null if reading fails
 
+     */
     public String readPatient(ID patientId) throws InvalidSessionException, MainzellisteNetworkException {
         try {
             ReadPatientsToken readPatientsToken = new ReadPatientsToken();
@@ -124,7 +150,12 @@ public class MainzellisteConnector implements MConnector {
         }
     }
 
-
+    /**
+     * Edits patient data in the Mainzelliste system.
+     *
+     * @param id the ID of the patient to edit
+     * @return the status code as a string, or null if editing fails
+     */
     public String editPatient(ID id) throws InvalidSessionException, MainzellisteNetworkException, JSONException {
         try {
             // Create edit token
@@ -150,7 +181,12 @@ public class MainzellisteConnector implements MConnector {
             return null;
         }
     }
-
+    /**
+     * Deletes a patient from the Mainzelliste system.
+     *
+     * @param id the ID of the patient to delete
+     * @return the status code as a string, or null if deletion fails
+     */
     public String deletePatient(ID id) throws InvalidSessionException, MainzellisteNetworkException {
         try {
             // Create deletePatient token
@@ -173,6 +209,12 @@ public class MainzellisteConnector implements MConnector {
             return null;
         }
     }
+
+    /**
+     * Pings the Mainzelliste server to check connectivity.
+     *
+     * @return the status code of the ping response
+     */
     public int ping() throws MainzellisteNetworkException {
         MainzellisteResponse response = connection.doRequest(RequestMethod.DELETE, "", null);
         return response.getStatusCode();

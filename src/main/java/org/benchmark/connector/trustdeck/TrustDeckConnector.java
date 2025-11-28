@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 /**
  * Connector to ACE.
  *
- * @author Fabian Prasser, Armin Müller, Chethan Nagaraj
+ * @author Fabian Prasser, Armin Müller, Chethan N. Nagaraj
  */
 @Slf4j
 public class TrustDeckConnector implements TConnector{
@@ -206,7 +206,7 @@ public class TrustDeckConnector implements TConnector{
         try {
             this.trustDeckClient.pseudonyms(this.domain.getName()).create(identifierItem, false);
         } catch (TrustDeckClientLibraryException e) {
-            if (e.getResponseStatusCode().value() == 404) {
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
                 // Ignore 404 errors
                 return;
             }
@@ -232,7 +232,7 @@ public class TrustDeckConnector implements TConnector{
         try {
             this.trustDeckClient.pseudonyms(this.domain.getName()).get(identifierItem);
         } catch (TrustDeckClientLibraryException e) {
-            if (e.getResponseStatusCode().value() == 404) {
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
                 // Ignore 404 errors
                 return;
             }
@@ -257,8 +257,8 @@ public class TrustDeckConnector implements TConnector{
             this.trustDeckClient.pseudonyms(this.domain.getName()).update(identifierItem, updatePseudonym);
             log.debug(" Pseudonym Update successful for identifier :{} ", id);
         } catch (TrustDeckClientLibraryException e) {
-            if (e.getResponseStatusCode().value() == 404) {
-                //ignore
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
                 return;
             }
             log.debug("\nPseudonym update for id:{} failed with error {}",id, e.getResponseStatusCode());
@@ -278,8 +278,8 @@ public class TrustDeckConnector implements TConnector{
             IdentifierItem identifierItem = IdentifierItem.builder().identifier(id).idType(DEFAULT_ID_TYPE).build();
             this.trustDeckClient.pseudonyms(domain.getName()).delete(identifierItem);
         } catch (TrustDeckClientLibraryException e) {
-            if (e.getResponseStatusCode().value() == 404) {
-                //ignore
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
                 return;
             }
             log.debug("\nPseudonym deletion for id:{} failed with error {}",id, e.getResponseStatusCode());
