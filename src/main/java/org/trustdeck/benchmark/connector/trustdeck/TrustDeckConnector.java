@@ -201,8 +201,8 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.pseudonyms(this.domain.getName()).create(identifierItem, false);
         } catch (TrustDeckClientLibraryException e) {
-            if (e.getResponseStatusCode().value() == 404) {
-                //ignore
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
                 return;
             }
             throw new BenchmarkException(e);  // Throw non-404 errors
@@ -224,9 +224,9 @@ public class TrustDeckConnector implements Connector {
         try {
             this.trustDeckClient.pseudonyms(this.domain.getName()).get(identifierItem);
         } catch (TrustDeckClientLibraryException e) {
-            if (e.getResponseStatusCode().value() == 404) {
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
                 return;
-                // Silent 404 like ACE connector
             }
             throw new BenchmarkException(e);  // Throw non-404 errors
         }
@@ -245,8 +245,8 @@ public class TrustDeckConnector implements Connector {
             Pseudonym updatePseudonym = Pseudonym.builder().identifierItem(identifierItem).validFrom(DEFAULT_PSEUDONYM_VALID_FROM).build();
             this.trustDeckClient.pseudonyms(this.domain.getName()).update(identifierItem, updatePseudonym);
         } catch (TrustDeckClientLibraryException e) {
-            if (e.getResponseStatusCode().value() == 404) {
-                //ignore
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
                 return;
             }
             throw new BenchmarkException(e);  // Throw non-404 errors
@@ -264,8 +264,8 @@ public class TrustDeckConnector implements Connector {
             IdentifierItem identifierItem = IdentifierItem.builder().identifier(id).idType(DEFAULT_ID_TYPE).build();
             this.trustDeckClient.pseudonyms(domain.getName()).delete(identifierItem);
         } catch (TrustDeckClientLibraryException e) {
-            if (e.getResponseStatusCode().value() == 404) {
-                //ignore
+            if ((e.getResponseStatusCode() != null) && e.getResponseStatusCode().value() == 404) {
+                // Ignore 404 errors
                 return;
             }
             throw new BenchmarkException(e);  // Throw non-404 errors
